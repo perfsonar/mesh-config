@@ -3,11 +3,15 @@
 %define crontab_1 cron-mesh_config_agent
 %define crontab_2 cron-mesh_config_gui_agent
 
+<<<<<<< HEAD
 %define relnum 15
+=======
+%define relnum 1
+>>>>>>> origin/master
 %define disttag pSPS
 
 Name:			perl-perfSONAR_PS-MeshConfig
-Version:		3.4
+Version:		3.4.2
 Release:		%{relnum}.%{disttag}
 Summary:		perfSONAR_PS Mesh Configuration Agent
 License:		Distributable, see LICENSE
@@ -120,7 +124,6 @@ chown perfsonar:perfsonar /var/lib/perfsonar/mesh_config
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Config
 %{install_base}/lib/perfSONAR_PS/NPToolkit
 %{install_base}/lib/perfSONAR_PS/Utils
-%{install_base}/lib/perfSONAR_PS/XML
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/Base.pm
 %{install_base}/lib/Net/NTP.pm
 
@@ -136,11 +139,7 @@ chown perfsonar:perfsonar /var/lib/perfsonar/mesh_config
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/generate_configuration
 %config(noreplace) %{install_base}/etc/agent_configuration.conf
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Agent.pm
-%{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/perfSONARBUOY.pm
-%{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/PingER.pm
-%{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/TracerouteMaster.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm
-%{install_base}/lib/OWP/*
 %{install_base}/lib/perfSONAR_PS/RegularTesting
 %{install_base}/scripts/cron-mesh_config_agent
 %doc %{install_base}/doc/INSTALL

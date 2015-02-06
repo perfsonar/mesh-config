@@ -1,14 +1,15 @@
-package perfSONAR_PS::MeshConfig::Config::Location;
+package perfSONAR_PS::MeshConfig::Config::Address;
 use strict;
 use warnings;
 
 our $VERSION = 3.1;
 
 use Moose;
+use Params::Validate qw(:all);
 
 =head1 NAME
 
-perfSONAR_PS::MeshConfig::Config::Location;
+perfSONAR_PS::MeshConfig::Config::Host;
 
 =head1 DESCRIPTION
 
@@ -18,15 +19,35 @@ perfSONAR_PS::MeshConfig::Config::Location;
 
 extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
-has 'street_address'      => (is => 'rw', isa => 'Str');
-has 'city'                => (is => 'rw', isa => 'Str');
-has 'state'               => (is => 'rw', isa => 'Str');
-has 'country'             => (is => 'rw', isa => 'Str');
-has 'postal_code'         => (is => 'rw', isa => 'Str');
-has 'latitude'            => (is => 'rw', isa => 'Num');
-has 'longitude'           => (is => 'rw', isa => 'Num');
+has 'address'             => (is => 'rw', isa => 'Str');
 
-has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Base');
+has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Base'); # Any of "Host", "Organization" or "Mesh"
+
+override 'parse' => sub {
+    my ($class, $description, $strict) = @_;
+
+    # For backwards compatibility, convert it to an object if it's just a
+    # string
+    unless (ref($description)) { 
+        $description = { address => $description };
+    }
+
+    return $class->SUPER::parse($description, $strict);
+};
+
+override 'unparse' => sub {
+    my ($self) = @_;
+
+    my $object = super();
+
+   # For backwards compatibility, convert it from an object to a string if
+   # it doesn't use any of the properties of the object other than 'address'
+   if (scalar(keys %$object) == 1 and $object->{address}) {
+        $object = $object->{address};
+    }
+
+    return $object;
+};
 
 1;
 
