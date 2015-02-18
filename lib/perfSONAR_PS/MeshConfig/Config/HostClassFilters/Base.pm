@@ -1,4 +1,4 @@
-package perfSONAR_PS::MeshConfig::Config::Address;
+package perfSONAR_PS::MeshConfig::Config::HostClassFilters::Base;
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Params::Validate qw(:all);
 
 =head1 NAME
 
-perfSONAR_PS::MeshConfig::Config::Host;
+perfSONAR_PS::MeshConfig::Config::HostClassFilters::Base;
 
 =head1 DESCRIPTION
 
@@ -19,21 +19,18 @@ perfSONAR_PS::MeshConfig::Config::Host;
 
 extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
-has 'address'             => (is => 'rw', isa => 'Str');
-has 'tags'                => (is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] });
-
-has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
+has 'value'               => (is => 'rw', isa => 'Str');
 
 override 'parse' => sub {
-    my ($class, $description, $strict, $requesting_agent) = @_;
+    my ($class, $description, $strict) = @_;
 
     # For backwards compatibility, convert it to an object if it's just a
     # string
     unless (ref($description)) { 
-        $description = { address => $description };
+        $description = { value => $description };
     }
 
-    return $class->SUPER::parse($description, $strict, $requesting_agent);
+    return $class->SUPER::parse($description, $strict);
 };
 
 override 'unparse' => sub {
@@ -42,9 +39,9 @@ override 'unparse' => sub {
     my $object = super();
 
    # For backwards compatibility, convert it from an object to a string if
-   # it doesn't use any of the properties of the object other than 'address'
-   if (scalar(keys %$object) == 1 and $object->{address}) {
-        $object = $object->{address};
+   # it doesn't use any of the properties of the object other than 'value'
+   if (scalar(keys %$object) == 1 and $object->{value}) {
+        $object = $object->{value};
     }
 
     return $object;

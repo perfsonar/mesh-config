@@ -1,4 +1,4 @@
-package perfSONAR_PS::MeshConfig::Config::TestParameters;
+package perfSONAR_PS::MeshConfig::Config::HostClassDataSource;
 use strict;
 use warnings;
 
@@ -6,10 +6,9 @@ our $VERSION = 3.1;
 
 use Moose;
 
-use perfSONAR_PS::MeshConfig::Config::TestParameters::Traceroute;
-use perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYOwamp;
-use perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYBwctl;
-use perfSONAR_PS::MeshConfig::Config::TestParameters::PingER;
+use perfSONAR_PS::MeshConfig::Config::HostClassDataSources::Mesh;
+use perfSONAR_PS::MeshConfig::Config::HostClassDataSources::CurrentMesh;
+use perfSONAR_PS::MeshConfig::Config::HostClassDataSources::RequestingAgent;
 
 =head1 NAME
 
@@ -25,6 +24,8 @@ extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
 has 'type'                => (is => 'rw', isa => 'Str');
 
+has 'parent'                   => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::HostClass');
+
 override 'parse' => sub {
     my ($class, $description, $strict, $requesting_agent) = @_;
 
@@ -33,26 +34,24 @@ override 'parse' => sub {
             die("Unspecified test parameters type");
         }
 
-        if ($description->{type} eq "traceroute") {
-            return perfSONAR_PS::MeshConfig::Config::TestParameters::Traceroute->parse($description, $strict, $requesting_agent);
+        if ($description->{type} eq "mesh") {
+            return perfSONAR_PS::MeshConfig::Config::HostClassDataSources::Mesh->parse($description, $strict, $requesting_agent);
         }
-        elsif ($description->{type} eq "perfsonarbuoy/owamp") {
-            return perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYOwamp->parse($description, $strict, $requesting_agent);
+        elsif ($description->{type} eq "current_mesh") {
+            return perfSONAR_PS::MeshConfig::Config::HostClassDataSources::CurrentMesh->parse($description, $strict, $requesting_agent);
         }
-        elsif ($description->{type} eq "perfsonarbuoy/bwctl") {
-            return perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYBwctl->parse($description, $strict, $requesting_agent);
-        }
-        elsif ($description->{type} eq "pinger") {
-            return perfSONAR_PS::MeshConfig::Config::TestParameters::PingER->parse($description, $strict, $requesting_agent);
+        elsif ($description->{type} eq "requesting_agent") {
+            return perfSONAR_PS::MeshConfig::Config::HostClassDataSources::RequestingAgent->parse($description, $strict, $requesting_agent);
         }
         else {
-            die("Unknown test parameters type: ".$description->{type});
+            die("Unknown host class data source type: ".$description->{type});
         }
     }
     else {
         return super($class, $description, $strict);
     }
 };
+
 
 1;
 

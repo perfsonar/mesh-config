@@ -92,17 +92,12 @@ sub init {
 
 sub add_mesh_tests {
     my ($self, @args) = @_;
-    my $parameters = validate( @args, { mesh => 1, tests => 1, hosts => 1 } );
+    my $parameters = validate( @args, { mesh => 1, tests => 1, addresses => 1 } );
     my $mesh   = $parameters->{mesh};
     my $tests  = $parameters->{tests};
-    my $hosts  = $parameters->{hosts};
+    my $addresses = $parameters->{addresses};
 
-    my %host_addresses = ();
-    foreach my $host (@$hosts) {
-        foreach my $addr_obj (@{ $host->addresses }) {
-            $host_addresses{$addr_obj->address} = 1;
-        }
-    }
+    my %host_addresses = map { $_ => 1 } @$addresses;
 
     my %addresses_added = ();
 
@@ -148,11 +143,10 @@ sub add_mesh_tests {
                     # Check if a specific test (i.e. same
                     # source/destination/test parameters) has been added
                     # before, and if so, don't add it.
-                    my $already_added = $self->__add_test_if_not_added({ 
-                                                                         source             => $pair->{source}->{address},
-                                                                         destination        => $pair->{destination}->{address},
-                                                                         parameters         => $test->parameters,
-                                                                     });
+                    my %duplicate_params = %{$test->parameters->unparse()};
+                    $duplicate_params{source} = $pair->{source}->{address};
+                    $duplicate_params{destination} = $pair->{destination}->{address};
+                    my $already_added = $self->__add_test_if_not_added(\%duplicate_params);
 
                     if ($already_added) {
                         $logger->debug("Test between ".$pair->{source}->{address}." to ".$pair->{destination}->{address}." already exists. Not re-adding");
