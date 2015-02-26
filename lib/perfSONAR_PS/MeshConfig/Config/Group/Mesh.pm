@@ -31,18 +31,19 @@ sub source_destination_pairs {
 
     my %no_agent_map = ();
     if ($self->no_agents) {
-        %no_agent_map = map { $_->address => 1 } $self->resolve_addresses($self->no_agents);
+        %no_agent_map = map { $_ => 1 } @{ $self->no_agents };
     }
 
     my @pairs = ();
-    foreach my $source ($self->resolve_addresses($self->members)) {
-        foreach my $destination ($self->resolve_addresses($self->members)) {
+    foreach my $source (@{ $self->members }) {
+        foreach my $destination (@{ $self->members }) {
             next if $source eq $destination;
 
-            push @pairs, $self->__build_endpoint_pairs({
-                                            source_address => $source, source_no_agent => $no_agent_map{$source->address},
-                                            destination_address => $destination, destination_no_agent => $no_agent_map{$destination->address},
+            my $pair = $self->__build_pair({
+                                            source_address => $source, source_no_agent => $no_agent_map{$source},
+                                            destination_address => $destination, destination_no_agent => $no_agent_map{$destination},
                                           });
+            push @pairs, $pair;
         }
     }
 

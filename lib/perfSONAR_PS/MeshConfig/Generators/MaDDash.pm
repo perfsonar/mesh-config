@@ -281,11 +281,15 @@ sub generate_maddash_config {
             foreach my $pair (@{ $test->members->source_destination_pairs }) {
                 next if ($pair->{source}->{no_agent} and $pair->{destination}->{no_agent});
 
-                my $tester = $pair->{source}->{no_agent}?$pair->{destination}->{addr_obj}:$pair->{source}->{addr_obj};
+                my $tester = $pair->{source}->{no_agent}?$pair->{destination}->{address}:$pair->{source}->{address};
 
-                my $host = $tester->parent;
+                my $hosts = $test->lookup_hosts({ addresses => [ $tester ] });
+                my $ma;
 
-                my $ma = $host->lookup_measurement_archive({ type => $test->parameters->type, recursive => 1 });
+                foreach my $host (@$hosts) {
+                    $ma = $host->lookup_measurement_archive({ type => $test->parameters->type, recursive => 1 });
+                    last if $ma;
+                }
 
                 unless ($ma) {
                     die("Couldn't find ma for host: ".$tester);
@@ -293,7 +297,8 @@ sub generate_maddash_config {
 
                 my $src_addr = $pair->{source}->{address};
                 my $dst_addr = $pair->{destination}->{address};
-
+                
+                
                 #get test address type
                 my $test_type = '';
                 if($test->parameters->ipv4_only || is_ipv4($src_addr) || is_ipv4($dst_addr)){

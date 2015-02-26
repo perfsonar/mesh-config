@@ -28,7 +28,7 @@ sub BUILD {
 sub source_destination_pairs {
     my ($self) = @_;
 
-    my @members = $self->resolve_addresses($self->members);
+    my @members = @{ $self->members };
 
     my @pairs = ();
 
@@ -39,15 +39,17 @@ sub source_destination_pairs {
 
             # Specify 'no_agent' to ensure that the previous member will handle
             # both sides of the test.
-            push @pairs, $self->__build_endpoint_pairs({
+            my $pair = $self->__build_pair({
                                             source_address => $local, source_no_agent => 0,
                                             destination_address => $remote, destination_no_agent => 1,
                                           });
+            push @pairs, $pair;
 
-            push @pairs, $self->__build_endpoint_pairs({
+            $pair = $self->__build_pair({
                                             source_address => $remote, source_no_agent => 1,
                                             destination_address => $local, destination_no_agent => 0,
                                           });
+            push @pairs, $pair;
         }
     }
 

@@ -1,4 +1,4 @@
-package perfSONAR_PS::MeshConfig::Config::Group::Disjoint;
+package perfSONAR_PS::MeshConfig::Config::Group::Star;
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use Moose;
 
 =head1 NAME
 
-perfSONAR_PS::MeshConfig::Config::Group::Disjoint;
+perfSONAR_PS::MeshConfig::Config::Group::Star;
 
 =head1 DESCRIPTION
 
@@ -18,13 +18,13 @@ perfSONAR_PS::MeshConfig::Config::Group::Disjoint;
 
 extends 'perfSONAR_PS::MeshConfig::Config::Group';
 
-has 'a_members'           => (is => 'rw', isa => 'ArrayRef[Str]');
-has 'b_members'           => (is => 'rw', isa => 'ArrayRef[Str]');
+has 'center_address'       => (is => 'rw', isa => 'Str');
+has 'members'             => (is => 'rw', isa => 'ArrayRef[Str]');
 has 'no_agents'           => (is => 'rw', isa => 'ArrayRef[Str]');
 
 sub BUILD {
     my ($self) = @_;
-    $self->type("disjoint");
+    $self->type("star");
 }
 
 sub source_destination_pairs {
@@ -36,20 +36,18 @@ sub source_destination_pairs {
     }
 
     my @pairs = ();
-    foreach my $a_member (@{ $self->a_members }) {
-        foreach my $b_member (@{ $self->b_members }) {
+    foreach my $member (@{ $self->members }) {
+        next if $member eq $self->center_address;
+
+        foreach my $pair ([ $self->center_address, $member ], [ $member, $self->center_address ]) {
+            my $source = $pair->[0];
+            my $destination = $pair->[1];
+
             my $pair = $self->__build_pair({
-                                            source_address => $a_member, source_no_agent => $no_agent_map{$a_member},
-                                            destination_address => $b_member, destination_no_agent => $no_agent_map{$b_member},
+                                            source_address => $source, source_no_agent => $no_agent_map{$source},
+                                            destination_address => $destination, destination_no_agent => $no_agent_map{$destination},
                                           });
             push @pairs, $pair;
-
-            $pair = $self->__build_pair({
-                                            source_address => $b_member, source_no_agent => $no_agent_map{$b_member},
-                                            destination_address => $a_member, destination_no_agent => $no_agent_map{$a_member},
-                                          });
-            push @pairs, $pair;
-
         }
     }
 

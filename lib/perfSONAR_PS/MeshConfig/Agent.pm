@@ -283,9 +283,7 @@ sub __configure_host {
 
             # Find the host block associated with this machine
             my $hosts = $mesh->lookup_hosts({ addresses => $self->addresses });
-            my $host_classes = $mesh->lookup_host_classes_by_addresses({ addresses => $self->addresses });
-
-            unless ($hosts->[0] or $host_classes->[0]) {
+            unless ($hosts->[0]) {
                 if ($mesh_params->{permit_non_participation}) {
                     my $msg = "This machine is not included in any tests for this mesh: ".join(", ", @{ $self->addresses });
                     $logger->info($msg);
@@ -312,13 +310,6 @@ sub __configure_host {
             }
 
             my %addresses = ();
-
-            # Add any addresses pre-configured
-            foreach my $addr (@{ $self->addresses }) {
-                $addresses{$addr} = 1;
-            }
-
-            # Add any addresses found in host blocks
             foreach my $host (@$hosts) {
                 if ($host->has_unknown_attributes) {
                     if ($mesh_params->{required}) {
@@ -338,8 +329,7 @@ sub __configure_host {
 
             my @addresses = keys %addresses;
 
-	    # Find the tests that this machine is expected to run with all the
-	    # addresses obtained
+            # Find the tests that this machine is expected to run
             my $tests = $mesh->lookup_tests_by_addresses({ addresses => \@addresses });
             if (scalar(@$tests) == 0) {
                 if ($mesh_params->{required}) {
@@ -356,7 +346,7 @@ sub __configure_host {
             eval {
                 $generator->add_mesh_tests({ mesh => $mesh,
                                              tests => $tests,
-                                             addresses => \@addresses,
+                                             hosts => $hosts,
                                            });
             };
             if ($@) {
