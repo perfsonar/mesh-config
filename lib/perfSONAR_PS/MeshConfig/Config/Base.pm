@@ -21,7 +21,6 @@ perfSONAR_PS::MeshConfig::Config::Base;
 
 =cut
 
-has 'requesting_agent'     => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
 has 'cache'                => (is => 'rw', isa => 'HashRef');
 has 'unknown_attributes'  => (is => 'rw', isa => 'HashRef', default => sub { {} });
 
@@ -60,23 +59,13 @@ sub merge {
     $parent = $self->parent;
     $parent = $other->parent if not $parent;
 
-    my $requesting_agent;
-    $requesting_agent = $self->requesting_agent;
-    $requesting_agent = $other->requesting_agent if not $requesting_agent;
-
-    my $ret_obj = $self->blessed()->parse($merged_description, 1, $requesting_agent);
-
-    $ret_obj->parent($parent) if $parent;
-
-    return $ret_obj;
+    return $self->blessed()->parse($merged_description, 1, $parent);
 }
 
 sub parse {
-    my ($class, $description, $strict, $requesting_agent) = @_;
+    my ($class, $description, $strict) = @_;
 
     my $object = $class->new();
-
-    $object->requesting_agent($requesting_agent) if $requesting_agent;
 
     my $meta = $object->meta;
 
@@ -84,10 +73,6 @@ sub parse {
         my $variable = $attribute->name;
         my $type     = $attribute->type_constraint;
         my $writer   = $attribute->get_write_method;
-
-        # Don't parse the 'internal' parameters
-        next if ($variable eq "parent" or $variable eq "cache"
-                 or $variable eq "unknown_attributes" or $variable eq "requesting_agent");
 
         next unless (defined $description->{$variable});
 
@@ -106,7 +91,7 @@ sub parse {
             foreach my $element (@{ $description->{$variable} }) {
                 my $parsed;
                 if ($array_type =~ /perfSONAR_PS::MeshConfig::Config::/) {
-                    $parsed = $array_type->parse($element, $strict, $requesting_agent);
+                    $parsed = $array_type->parse($element, $strict);
                     $parsed->parent($object) if ($parsed->can("parent"));
                 }
                 else {
@@ -119,7 +104,7 @@ sub parse {
             $parsed_value = \@array;
         }
         elsif ($type =~ /perfSONAR_PS::MeshConfig::Config::/) {
-            $parsed_value = $type->parse($description->{$variable}, $strict, $requesting_agent);
+            $parsed_value = $type->parse($description->{$variable}, $strict);
             $parsed_value->parent($object) if ($parsed_value->can("parent"));
         }
         elsif (JSON::is_bool($description->{$variable})) {
@@ -158,14 +143,13 @@ sub unparse {
 
     my %description = ();
 
-    for my $attribute ( sort $meta->get_all_attributes ) {
+    for my $attribute ( sort $meta->compute_all_applicable_attributes ) {
         my $variable = $attribute->name;
         my $type     = $attribute->type_constraint;
         my $reader   = $attribute->get_read_method;
         my $value    = $self->$reader;
 
-        next if ($variable eq "parent" or $variable eq "cache"
-                 or $variable eq "unknown_attributes" or $variable eq "requesting_agent");
+        next if ($variable eq "parent" or $variable eq "cache" or $variable eq "unknown_attributes");
 
         next unless (defined $value);
 

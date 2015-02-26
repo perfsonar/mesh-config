@@ -25,7 +25,7 @@ has 'tags'                => (is => 'rw', isa => 'ArrayRef[Str]', default => sub
 has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
 
 override 'parse' => sub {
-    my ($class, $description, $strict, $requesting_agent) = @_;
+    my ($class, $description, $strict) = @_;
 
     # For backwards compatibility, convert it to an object if it's just a
     # string
@@ -33,7 +33,7 @@ override 'parse' => sub {
         $description = { address => $description };
     }
 
-    return $class->SUPER::parse($description, $strict, $requesting_agent);
+    return $class->SUPER::parse($description, $strict);
 };
 
 override 'unparse' => sub {
