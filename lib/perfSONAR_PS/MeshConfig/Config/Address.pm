@@ -20,7 +20,6 @@ perfSONAR_PS::MeshConfig::Config::Host;
 extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
 has 'address'             => (is => 'rw', isa => 'Str');
-has 'tags'                => (is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] });
 
 has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
 
