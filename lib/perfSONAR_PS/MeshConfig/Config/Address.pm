@@ -21,7 +21,7 @@ extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
 has 'address'             => (is => 'rw', isa => 'Str');
 
-has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
+has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Base'); # Any of "Host", "Organization" or "Mesh"
 
 override 'parse' => sub {
     my ($class, $description, $strict) = @_;
