@@ -1,0 +1,3 @@
+bin/build_json usr/lib/perfsonar/bin
+bin/validate_json usr/lib/perfsonar/bin
+bin/validate_configuration usr/lib/perfsonar/bin

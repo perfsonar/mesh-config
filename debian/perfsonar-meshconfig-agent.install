@@ -1,0 +1,6 @@
+#!/usr/bin/dh-exec
+etc/agent_configuration.conf => etc/perfsonar/agentconfiguration.conf
+scripts/cron-mesh_config_agent => etc/cron.d/perfsonar-meshconfig-agent
+bin/generate_configuration usr/lib/perfsonar/bin
+lib/perfSONAR_PS/MeshConfig/Agent.pm usr/share/perl5/perfSONAR_PS/MeshConfig
+lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm usr/share/perl5/perfSONAR_PS/MeshConfig/Generators

@@ -1,0 +1,6 @@
+#!/usr/bin/dh-exec
+etc/gui_agent_configuration.conf => etc/perfsonar/guiagentconfiguration.conf
+scripts/cron-mesh_config_gui_agent => etc/cron.d/perfsonar-meshconfig-guiagent
+bin/generate_gui_configuration usr/lib/perfsonar/bin
+lib/perfSONAR_PS/MeshConfig/GUIAgent.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig
+lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig/Generators

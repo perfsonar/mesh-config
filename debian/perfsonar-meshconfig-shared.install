@@ -1,0 +1,3 @@
+lib/perfSONAR_PS/MeshConfig/Utils.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig
+lib/perfSONAR_PS/MeshConfig/Config usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig
+lib/perfSONAR_PS/MeshConfig/Generators/Base.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig/Generators
