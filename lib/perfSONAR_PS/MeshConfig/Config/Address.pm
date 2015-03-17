@@ -20,11 +20,12 @@ perfSONAR_PS::MeshConfig::Config::Host;
 extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
 has 'address'             => (is => 'rw', isa => 'Str');
+has 'tags'                => (is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] });
 
-has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Base'); # Any of "Host", "Organization" or "Mesh"
+has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
 
 override 'parse' => sub {
-    my ($class, $description, $strict) = @_;
+    my ($class, $description, $strict, $requesting_agent) = @_;
 
     # For backwards compatibility, convert it to an object if it's just a
     # string
@@ -32,7 +33,7 @@ override 'parse' => sub {
         $description = { address => $description };
     }
 
-    return $class->SUPER::parse($description, $strict);
+    return $class->SUPER::parse($description, $strict, $requesting_agent);
 };
 
 override 'unparse' => sub {

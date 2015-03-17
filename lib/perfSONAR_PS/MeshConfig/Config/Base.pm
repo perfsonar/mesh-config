@@ -8,6 +8,8 @@ use Moose;
 
 use FreezeThaw qw(cmpStr);
 use Clone qw(clone);
+use Hash::Merge;
+use Params::Validate qw(:all);
 
 =head1 NAME
 
@@ -19,20 +21,101 @@ perfSONAR_PS::MeshConfig::Config::Base;
 
 =cut
 
+has 'requesting_agent'     => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
 has 'cache'                => (is => 'rw', isa => 'HashRef');
 has 'unknown_attributes'  => (is => 'rw', isa => 'HashRef', default => sub { {} });
 
+sub merge {
+    my ($self, @args) = @_;
+    my $parameters = validate( @args, { other => 1 });
+    my $other = $parameters->{other};
+
+    my $self_description  = $self->unparse();
+    my $other_description = $other->unparse();
+
+    # Right Precedence, but don't merge arrays
+    my %merge_behavior = (
+        'SCALAR' => {
+            'SCALAR' => sub { $_[1] },
+            'ARRAY'  => sub { $_[1] },
+            'HASH'   => sub { $_[1] },
+        },
+        'ARRAY' => {
+            'SCALAR' => sub { $_[1] },
+            'ARRAY'  => sub { $_[1] },
+            'HASH'   => sub { $_[1] }, 
+        },
+        'HASH' => {
+            'SCALAR' => sub { $_[1] },
+            'ARRAY'  => sub { $_[1] },
+            'HASH'   => sub { Hash::Merge::_merge_hashes( $_[0], $_[1] ) }, 
+        },
+    );
+
+    my $merge = Hash::Merge->new();
+    $merge->specify_behavior(\%merge_behavior);
+    my $merged_description = $merge->merge($self_description, $other_description);
+
+    my $parent;
+    $parent = $self->parent;
+    $parent = $other->parent if not $parent;
+
+    my $requesting_agent;
+    $requesting_agent = $self->requesting_agent;
+    $requesting_agent = $other->requesting_agent if not $requesting_agent;
+
+    my $ret_obj = $self->blessed()->parse($merged_description, 1, $requesting_agent);
+
+    $ret_obj->parent($parent) if $parent;
+
+    return $ret_obj;
+}
+
 sub parse {
-    my ($class, $description, $strict) = @_;
+    my ($class, $description, $strict, $requesting_agent) = @_;
 
     my $object = $class->new();
 
     my $meta = $object->meta;
 
-    for my $attribute ( map { $meta->get_attribute($_) } sort $meta->get_attribute_list ) {
+    # Check if this should be handled by a subclass of the type
+    if ($object->can("type") and scalar($meta->subclasses) > 0) {
+        unless ($description->{type}) {
+           die("Need to specify a 'type' for $class");
+        }
+
+        my @classes = ( $class );
+        push @classes, $meta->subclasses;
+
+        my $found_type;
+        foreach my $subclass (@classes) {
+            eval {
+                if ($subclass->can("type") and $subclass->type eq $description->{type}) {
+                    $meta = $subclass;
+                    $object = $subclass->new();
+                    $found_type = 1;
+                }
+            };
+
+            last if $found_type;
+        }
+
+        unless ($found_type) {
+            die("Unknown type: ".$description->{type});
+        }
+    }
+
+    # Set the requesting agent
+    $object->requesting_agent($requesting_agent) if $requesting_agent;
+
+    foreach my $attribute ($object->get_class_attrs()) {
         my $variable = $attribute->name;
         my $type     = $attribute->type_constraint;
         my $writer   = $attribute->get_write_method;
+
+        # Don't parse the 'internal' parameters
+        next if ($variable eq "parent" or $variable eq "cache"
+                 or $variable eq "unknown_attributes" or $variable eq "requesting_agent");
 
         next unless (defined $description->{$variable});
 
@@ -51,7 +134,7 @@ sub parse {
             foreach my $element (@{ $description->{$variable} }) {
                 my $parsed;
                 if ($array_type =~ /perfSONAR_PS::MeshConfig::Config::/) {
-                    $parsed = $array_type->parse($element, $strict);
+                    $parsed = $array_type->parse($element, $strict, $requesting_agent);
                     $parsed->parent($object) if ($parsed->can("parent"));
                 }
                 else {
@@ -64,7 +147,7 @@ sub parse {
             $parsed_value = \@array;
         }
         elsif ($type =~ /perfSONAR_PS::MeshConfig::Config::/) {
-            $parsed_value = $type->parse($description->{$variable}, $strict);
+            $parsed_value = $type->parse($description->{$variable}, $strict, $requesting_agent);
             $parsed_value->parent($object) if ($parsed_value->can("parent"));
         }
         elsif (JSON::is_bool($description->{$variable})) {
@@ -103,13 +186,14 @@ sub unparse {
 
     my %description = ();
 
-    for my $attribute ( sort $meta->compute_all_applicable_attributes ) {
+    for my $attribute ( sort $meta->get_all_attributes ) {
         my $variable = $attribute->name;
         my $type     = $attribute->type_constraint;
         my $reader   = $attribute->get_read_method;
         my $value    = $self->$reader;
 
-        next if ($variable eq "parent" or $variable eq "cache" or $variable eq "unknown_attributes");
+        next if ($variable eq "parent" or $variable eq "cache"
+                 or $variable eq "unknown_attributes" or $variable eq "requesting_agent");
 
         next unless (defined $value);
 
@@ -142,6 +226,10 @@ sub unparse {
         $description{$attribute} = $self->unknown_attributes->{$attribute};
     }
 
+    if ($self->can("type")) {
+        $description{type} = $self->type;
+    }
+
     return \%description;
 }
 
@@ -164,6 +252,20 @@ sub has_unknown_attributes {
     return (scalar(keys %{ $self->unknown_attributes }) > 0);
 }
 
+sub get_class_attrs {
+    my ($class) = @_;
+
+    my @ancestors = reverse $class->meta->linearized_isa;
+
+    my %attrs = ();
+    foreach my $class (@ancestors) {
+        for my $attribute ( map { $class->meta->get_attribute($_) } sort $class->meta->get_attribute_list ) {
+            $attrs{$attribute->name} = $attribute;
+        }
+    }
+
+    return values %attrs;
+}
 
 1;
 

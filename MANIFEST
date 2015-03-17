@@ -14,6 +14,7 @@ etc/agent_configuration.conf
 etc/gui_agent_configuration.conf
 lib/Net/NTP.pm
 lib/perfSONAR_PS/MeshConfig/Agent.pm
+lib/perfSONAR_PS/MeshConfig/Config/Address.pm
 lib/perfSONAR_PS/MeshConfig/Config/Administrator.pm
 lib/perfSONAR_PS/MeshConfig/Config/Base.pm
 lib/perfSONAR_PS/MeshConfig/Config/ExpectedTestResults.pm
@@ -25,6 +26,19 @@ lib/perfSONAR_PS/MeshConfig/Config/Group/Mesh.pm
 lib/perfSONAR_PS/MeshConfig/Config/Group/OrderedMesh.pm
 lib/perfSONAR_PS/MeshConfig/Config/Group/Star.pm
 lib/perfSONAR_PS/MeshConfig/Config/Host.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClass.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassDataSource.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassDataSources/CurrentMesh.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassDataSources/Mesh.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassDataSources/RequestingAgent.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/AddressType.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/Base.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/HostClass.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/Netmask.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/OrganizationName.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/SiteName.pm
+lib/perfSONAR_PS/MeshConfig/Config/HostClassFilters/Tag.pm
 lib/perfSONAR_PS/MeshConfig/Config/Location.pm
 lib/perfSONAR_PS/MeshConfig/Config/MeasurementArchive.pm
 lib/perfSONAR_PS/MeshConfig/Config/Mesh.pm
@@ -63,6 +77,7 @@ lib/perfSONAR_PS/NPToolkit/Services/SimpleLSBootstrap.pm
 lib/perfSONAR_PS/NPToolkit/Services/YumCron.pm
 lib/perfSONAR_PS/NPToolkit/Services/esmond.pm
 lib/perfSONAR_PS/NPToolkit/Services/httpd.pm
+lib/perfSONAR_PS/NPToolkit/Services/iperf3.pm
 lib/perfSONAR_PS/RegularTesting/Config.pm
 lib/perfSONAR_PS/RegularTesting/MeasurementArchives/Base.pm
 lib/perfSONAR_PS/RegularTesting/MeasurementArchives/EsmondBase.pm
