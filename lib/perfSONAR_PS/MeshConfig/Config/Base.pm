@@ -103,7 +103,7 @@ sub unparse {
 
     my %description = ();
 
-    for my $attribute ( sort $meta->compute_all_applicable_attributes ) {
+    for my $attribute ( sort $meta->get_all_attributes ) {
         my $variable = $attribute->name;
         my $type     = $attribute->type_constraint;
         my $reader   = $attribute->get_read_method;
