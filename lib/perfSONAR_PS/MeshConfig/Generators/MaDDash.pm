@@ -337,6 +337,7 @@ sub generate_maddash_config {
                     }
                 }elsif($enable_combined_graphs){
                     #New MA so use new graphs that try to plot all latency and throughput data together
+                    #Note using combined graphs forgoes bwctl protocol filters, tool name, and custom filters due to complexity
                     my $is_source_ma = $tester eq $src_addr ? 1 : 0;
                     foreach my $src_site_host(@{$src_site_hosts}){
                         foreach my $dst_site_host(@{$dst_site_hosts}){
@@ -383,8 +384,54 @@ sub generate_maddash_config {
                         }
                     }
                 }else{
-                    $graph_url .= "url=%maUrl&source=%row&dest=%col";
-                    $rev_graph_url .= "url=%maUrl&source=%col&dest=%row";
+                    my $graph_options = "";
+                    my $graph_custom_filters = "";
+                    #Set IP version if needed
+                    if($test->parameters->ipv6_only){
+                        $graph_options .= "&ipversion=6";
+                    }elsif($test->parameters->ipv6_only){
+                        $graph_options .= "&ipversion=4";
+                    }
+                    #Set BWCTL options if needed
+                    if($test->parameters->type eq "perfsonarbuoy/bwctl"){
+                        $graph_options .= "&protocol=" . $test->parameters->protocol if($test->parameters->protocol);
+                        $graph_custom_filters .= "bw-target-bandwidth:" . $test->parameters->udp_bandwidth if($test->parameters->udp_bandwidth);
+                        my $filter_tool_name = __get_check_option({ option => "filter_tool_name", test_type => $test->parameters->type, grid_name => $grid_name, maddash_options => $maddash_options });
+                        if($filter_tool_name && $test->parameters->tool){
+                            $graph_options .= "&tool=" . $test->parameters->tool;
+                        }
+                    } 
+                    #set custom filters
+                    my $custom_ma_filters = __get_check_option({ option => "ma_filter", test_type => $test->parameters->type, grid_name => $grid_name, maddash_options => $maddash_options });
+                    if($custom_ma_filters){
+                        if(ref $custom_ma_filters ne 'ARRAY'){
+                            $custom_ma_filters = [ $custom_ma_filters ];
+                        }
+                        foreach my $custom_ma_filter(@{$custom_ma_filters}){
+                            unless ($custom_ma_filter->{'ma_filter_name'}){
+                                die "custom_ma_filter config missing ma_filter_name property";
+                            }
+                            unless ($custom_ma_filter->{'mesh_parameter_name'}){
+                                die "custom_ma_filter config missing mesh_parameter_name property";
+                            }
+                            unless(exists $test->parameters->{$custom_ma_filter->{'mesh_parameter_name'}} 
+                                    && defined $test->parameters->{$custom_ma_filter->{'mesh_parameter_name'}} ){
+                                next;
+                            }
+                           $graph_custom_filters .= ',' if($graph_custom_filters);
+                           $graph_custom_filters .= $custom_ma_filter->{'ma_filter_name'} . ':' . $test->parameters->{$custom_ma_filter->{'mesh_parameter_name'}}; 
+                        }
+                    }
+                    $graph_custom_filters = "&filter=$graph_custom_filters" if($graph_custom_filters);
+                    
+                    $graph_url .= "url=%maUrl&source=%row&dest=%col" . $graph_options . $graph_custom_filters;
+                    if($is_full_mesh){
+                        $graph_url .= "&agent=%row";
+                        $rev_graph_url .= "url=%maUrl&source=%row&dest=%col" . $graph_options . $graph_custom_filters;
+                        $rev_graph_url .= "&agent=%col";
+                    }else{
+                        $rev_graph_url .= "url=%maUrl&source=%col&dest=%row" . $graph_options . $graph_custom_filters ;
+                    }
                 } 
                 
                 if ($row_hosts{$src_addr}) {
