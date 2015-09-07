@@ -34,7 +34,7 @@
 +0 2 * * * perfsonar /usr/lib/perfsonar/bin/generate_gui_configuration &> /var/log/perfsonar/mesh_configuration_gui_agent.log
 --- a/etc/gui_agent_configuration.conf
 +++ b/etc/gui_agent_configuration.conf
-@@ -75,14 +75,14 @@
+@@ -75,7 +75,7 @@
  # the mesh, these will be used.
  <maddash_options>
      <perfsonarbuoy/owamp>
@@ -43,7 +43,8 @@
          check_interval           1800
          check_time_range         900
          acceptable_loss_rate     0
-         critical_loss_rate       0.01
+@@ -83,7 +83,7 @@
+         retry_attempts 1
      </owamp>
      <perfsonarbuoy/bwctl>
 -        check_command            /opt/perfsonar_ps/nagios/bin/check_throughput.pl
@@ -60,11 +61,11 @@
 -has 'regular_testing_conf'   => (is => 'rw', isa => 'Str', default => "/opt/perfsonar_ps/regular_testing/etc/regular_testing.conf");
 +has 'regular_testing_conf'   => (is => 'rw', isa => 'Str', default => "/etc/perfsonar/regulartesting.conf");
  has 'force_bwctl_owamp'      => (is => 'rw', isa => 'Bool', default => 0);
- 
- has 'addresses'              => (is => 'rw', isa => 'ArrayRef[Str]');
+ has 'use_bwctl2'             => (is => 'rw', isa => 'Bool', default=>0);
+ has 'configure_archives'     => (is => 'rw', isa => 'Bool', default=>0);
 --- a/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
 +++ b/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-@@ -525,7 +525,7 @@
+@@ -567,7 +567,7 @@
  
  my %maddash_default_check_options = (
      "perfsonarbuoy/owamp" => {
@@ -72,13 +73,13 @@
 +        check_command => "/usr/lib/perfsonar/bin/check_owdelay.pl",
          check_interval => 1800,
          check_time_range => 900,
-         acceptable_loss_rate => 0,
-@@ -534,7 +534,7 @@
-         graph_url => '/serviceTest/graphWidget.cgi'
+         retry_interval => 600,
+@@ -581,7 +581,7 @@
+         ma_filter => [],
      },
      "perfsonarbuoy/bwctl" => {
 -        check_command => "/opt/perfsonar_ps/nagios/bin/check_throughput.pl",
 +        check_command => "/usr/lib/perfsonar/bin/check_throughput.pl",
          check_interval => 28800,
          check_time_range => 86400,
-         acceptable_throughput => 900,
+         retry_interval => 600,
