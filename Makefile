@@ -1,7 +1,7 @@
 PACKAGE=perfSONAR_PS-MeshConfig
 ROOTPATH=/opt/perfsonar_ps/mesh_config
-VERSION=3.4.2
-RELEASE=5
+VERSION=3.5
+RELEASE=0.7.rc2
 
 default:
 	@echo No need to build the package. Just run \"make install\"
@@ -27,9 +27,6 @@ rpminstall:
 	for i in `cat MANIFEST | grep ^etc`; do  mkdir -p `dirname $(ROOTPATH)/$${i}`; if [ -e $(ROOTPATH)/$${i} ]; then install -m 640 -c $${i} $(ROOTPATH)/$${i}.new; else install -m 640 -c $${i} $(ROOTPATH)/$${i}; fi; done
  
 install:
-	sed -i "s|/opt/perfsonar_ps/ls_cache_daemon|${ROOTPATH}|g" ./etc/ls_cache_daemon.conf
-	sed -i "s|/opt/perfsonar_ps/ls_cache_daemon|${ROOTPATH}|g" ./etc/ls_cache_daemon-logger.conf
-	for i in `ls ./scripts`; do sed -i "s|/opt/perfsonar_ps/ls_cache_daemon|${ROOTPATH}|g" ./scripts/$${i}; done
 	mkdir -p ${ROOTPATH}
 	tar ch --exclude=etc/* --exclude=*spec --exclude=MANIFEST --exclude=Makefile -T MANIFEST | tar x -C ${ROOTPATH}
 	for i in `cat MANIFEST | grep ^etc`; do  mkdir -p `dirname $(ROOTPATH)/$${i}`; if [ -e $(ROOTPATH)/$${i} ]; then install -m 640 -c $${i} $(ROOTPATH)/$${i}.new; else install -m 640 -c $${i} $(ROOTPATH)/$${i}; fi; done

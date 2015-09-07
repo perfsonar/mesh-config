@@ -9,7 +9,7 @@ use Params::Validate qw(:all);
 
 =head1 NAME
 
-perfSONAR_PS::MeshConfig::Config::HostClassFilters::OrganizationName;
+perfSONAR_PS::MeshConfig::Config::HostClassFilters::Tag;
 
 =head1 DESCRIPTION
 
@@ -30,13 +30,11 @@ sub check_address {
     my $host_class = $parameters->{host_class};
     my $address    = $parameters->{address};
 
-    print "Checking: ".$address->address."\n";
     my $matches;
     my $curr_obj = $address;
     while ($curr_obj and
            $curr_obj->can("tags")) {
             foreach my $tag (@{ $curr_obj->tags }) {
-                print "Checking: ".$tag."/".$self->tag."\n";
                 if (_matches(str => $tag, pattern => $self->tag, exact => $self->exact)) {
                     $matches = 1;
                     last;
@@ -66,10 +64,6 @@ sub _matches {
     }
 
     if (lc($str) eq lc($pattern)) {
-        return 1;
-    }
-
-    if (index(lc($str), lc($pattern)) > -1) {
         return 1;
     }
 

@@ -1,4 +1,4 @@
-perfsonar-meshconfig (3.5~1.rc1-1) UNRELEASED; urgency=low
+perfsonar-meshconfig (3.5~7.rc2-1) UNRELEASED; urgency=low
 
   * Port to Debian.
 

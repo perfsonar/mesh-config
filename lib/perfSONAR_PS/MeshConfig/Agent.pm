@@ -39,6 +39,8 @@ has 'meshes'                 => (is => 'rw', isa => 'ArrayRef[HashRef]', default
 
 has 'regular_testing_conf'   => (is => 'rw', isa => 'Str', default => "/opt/perfsonar_ps/regular_testing/etc/regular_testing.conf");
 has 'force_bwctl_owamp'      => (is => 'rw', isa => 'Bool', default => 0);
+has 'use_bwctl2'             => (is => 'rw', isa => 'Bool', default=>0);
+has 'configure_archives'     => (is => 'rw', isa => 'Bool', default=>0);
 
 has 'addresses'              => (is => 'rw', isa => 'ArrayRef[Str]');
 has 'requesting_agent'       => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Host');
@@ -52,7 +54,6 @@ has 'administrator_emails'   => (is => 'rw', isa => 'ArrayRef[Str]');
 has 'skip_redundant_tests'   => (is => 'rw', isa => 'Bool', default=>1);
 
 has 'errors'                 => (is => 'rw', isa => 'ArrayRef[HashRef]');
-
 my $logger = get_logger(__PACKAGE__);
 
 sub __build_requesting_agent {
@@ -93,9 +94,9 @@ sub __map_arrays {
 
         if ($array_mapping{$key} and 
             (not $array_mapping{$key}->{except_in} or
-             $array_mapping{$key}->{except_in} ne $outer_key)
+             (!$outer_key or $array_mapping{$key}->{except_in} ne $outer_key))
            ) {
-            $value = [ $value ] unless ref($value) eq "ARRAYREF";
+            $value = [ $value ] unless ref($value) eq "ARRAY";
             $key = $array_mapping{$key}->{value};
         }
 
@@ -127,12 +128,10 @@ sub init {
                                          validate_certificate => 0,
                                          ca_certificate_file => 0,
                                          ca_certificate_path => 0,
-                                         use_regular_testing => 0,
                                          regular_testing_conf => 0,
                                          force_bwctl_owamp    => 0,
-                                         traceroute_master_conf => 0,
-                                         owmesh_conf => 0,
-                                         pinger_landmarks => 0,
+                                         use_bwctl2           => 0,
+                                         configure_archives   => 0,
                                          skip_redundant_tests => 0,
                                          addresses => 0,
                                          from_address => 0,
@@ -277,7 +276,9 @@ sub __configure_host {
     my $generator = perfSONAR_PS::MeshConfig::Generators::perfSONARRegularTesting->new();
     my ($status, $res) = $generator->init({ config_file => $self->regular_testing_conf,
                                             skip_duplicates => $self->skip_redundant_tests,
-                                            force_bwctl_owamp => $self->force_bwctl_owamp });
+                                            force_bwctl_owamp => $self->force_bwctl_owamp,
+                                            use_bwctl2 => $self->use_bwctl2,
+                                            configure_archives => $self->configure_archives });
     if ($status != 0) {
         my $msg = "Problem initializing Regular Testing configuration: ".$res;
         $logger->error($msg);
@@ -413,6 +414,9 @@ sub __configure_host {
                 $generator->add_mesh_tests({ mesh => $mesh,
                                              tests => $tests,
                                              addresses => \@local_addresses,
+                                             local_host => $hosts->[0],
+                                             host_classes => $host_classes,
+                                             requesting_agent => $self->requesting_agent
                                            });
             };
             if ($@) {
@@ -441,7 +445,7 @@ sub __configure_host {
     if ($status and $self->restart_services) {
         ($status, $res) = $self->__restart_service({ name => "regular_testing" });
         if ($status != 0) {
-            my $msg = "Problem restarting Revular Testing: ".$res;
+            my $msg = "Problem restarting Regular Testing: ".$res;
             $logger->error($msg);
             foreach my $mesh_params (@{ $self->meshes }) {
                 $self->__add_error({ mesh => $mesh_params->{mesh}, host => $mesh_params->{host}, error_msg => $msg });

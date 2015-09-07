@@ -15,13 +15,21 @@ use perfSONAR_PS::MeshConfig::Generators::Base;
 use perfSONAR_PS::RegularTesting::Utils::ConfigFile qw( parse_file save_string );
 
 use perfSONAR_PS::RegularTesting::Config;
+use perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondLatency;
+use perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondThroughput;
+use perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondTraceroute;
 use perfSONAR_PS::RegularTesting::Test;
 use perfSONAR_PS::RegularTesting::Schedulers::Streaming;
 use perfSONAR_PS::RegularTesting::Tests::Powstream;
 use perfSONAR_PS::RegularTesting::Schedulers::RegularInterval;
 use perfSONAR_PS::RegularTesting::Tests::Bwctl;
+use perfSONAR_PS::RegularTesting::Tests::Bwctl2;
 use perfSONAR_PS::RegularTesting::Tests::Bwtraceroute;
+use perfSONAR_PS::RegularTesting::Tests::Bwtraceroute2;
 use perfSONAR_PS::RegularTesting::Tests::Bwping;
+use perfSONAR_PS::RegularTesting::Tests::Bwping2;
+use perfSONAR_PS::RegularTesting::Tests::BwpingOwamp;
+use perfSONAR_PS::RegularTesting::Tests::Bwping2Owamp;
 
 use Moose;
 
@@ -29,6 +37,8 @@ extends 'perfSONAR_PS::MeshConfig::Generators::Base';
 
 has 'regular_testing_conf'   => (is => 'rw', isa => 'perfSONAR_PS::RegularTesting::Config');
 has 'force_bwctl_owamp'      => (is => 'rw', isa => 'Bool');
+has 'use_bwctl2'             => (is => 'rw', isa => 'Bool');
+has 'configure_archives'     => (is => 'rw', isa => 'Bool');
 
 =head1 NAME
 
@@ -41,6 +51,29 @@ perfSONAR_PS::MeshConfig::Generators::perfSONARRegularTesting;
 =cut
 
 my $logger = get_logger(__PACKAGE__);
+my $default_summaries = {
+    "throughput" => [
+        {"event_type" => 'throughput', "summary_type" => 'average', "summary_window" => 86400},
+    ],
+    "latency" => [
+        {"event_type" => 'packet-loss-rate', "summary_type" => 'aggregation', "summary_window" => 300},
+        {"event_type" => 'histogram-owdelay', "summary_type" => 'aggregation', "summary_window" => 300},
+        {"event_type" => 'histogram-owdelay', "summary_type" => 'statistics', "summary_window" => 300},
+        {"event_type" => 'packet-loss-rate', "summary_type" => 'aggregation', "summary_window" => 3600},
+        {"event_type" => 'packet-loss-rate-bidir', "summary_type" => 'aggregation', "summary_window" => 3600},
+        {"event_type" => 'histogram-owdelay', "summary_type" => 'aggregation', "summary_window" => 3600},
+        {"event_type" => 'histogram-rtt', "summary_type" => 'aggregation', "summary_window" => 3600},
+        {"event_type" => 'histogram-owdelay', "summary_type" => 'statistics', "summary_window" => 3600},
+        {"event_type" => 'histogram-rtt', "summary_type" => 'statistics', "summary_window" => 3600},
+        {"event_type" => 'packet-loss-rate', "summary_type" => 'aggregation', "summary_window" => 86400},
+        {"event_type" => 'packet-loss-rate-bidir', "summary_type" => 'aggregation', "summary_window" => 86400},
+        {"event_type" => 'histogram-owdelay', "summary_type" => 'aggregation', "summary_window" => 86400},
+        {"event_type" => 'histogram-rtt', "summary_type" => 'aggregation', "summary_window" => 86400},
+        {"event_type" => 'histogram-owdelay', "summary_type" => 'statistics', "summary_window" => 86400},
+        {"event_type" => 'histogram-rtt', "summary_type" => 'statistics', "summary_window" => 86400},
+    ]
+};
+
 
 sub init {
     my ($self, @args) = @_;
@@ -48,12 +81,16 @@ sub init {
                                          config_file     => 1,
                                          skip_duplicates => 1,
                                          force_bwctl_owamp => 0,
+                                         use_bwctl2 => 0,
+                                         configure_archives => 0,
                                       });
 
     my $config_file       = $parameters->{config_file};
     my $skip_duplicates   = $parameters->{skip_duplicates};
     my $force_bwctl_owamp = $parameters->{force_bwctl_owamp};
-
+    my $use_bwctl2 = $parameters->{use_bwctl2};
+    my $configure_archives = $parameters->{configure_archives};
+    
     $self->SUPER::init({ config_file => $config_file, skip_duplicates => $skip_duplicates });
 
     my $config;
@@ -77,6 +114,16 @@ sub init {
         }
 
         $config->tests(\@new_tests);
+        
+         # Remove the existing archives that were added by the mesh configuration
+        my @new_archives = ();
+        foreach my $archive (@{ $config->measurement_archives }) {
+            next if ($archive->added_by_mesh);
+
+            push @new_archives, $archive;
+        }
+
+        $config->measurement_archives(\@new_archives);
     };
     if ($@) {
         my $msg = "Problem initializing pinger landmarks: ".$@;
@@ -86,17 +133,22 @@ sub init {
 
     $self->regular_testing_conf($config);
     $self->force_bwctl_owamp($force_bwctl_owamp) if defined $force_bwctl_owamp;
-
+    $self->use_bwctl2($use_bwctl2) if defined $use_bwctl2;
+    $self->configure_archives($configure_archives) if defined $configure_archives;
+    
     return (0, "");
 }
 
 sub add_mesh_tests {
     my ($self, @args) = @_;
-    my $parameters = validate( @args, { mesh => 1, tests => 1, addresses => 1 } );
+    my $parameters = validate( @args, { mesh => 1, tests => 1, addresses => 1, local_host => 1, host_classes => 1, requesting_agent => 1 } );
     my $mesh   = $parameters->{mesh};
     my $tests  = $parameters->{tests};
     my $addresses = $parameters->{addresses};
-
+    my $local_host = $parameters->{local_host};
+    my $host_classes = $parameters->{host_classes};
+    my $requesting_agent = $parameters->{requesting_agent};
+    
     my %host_addresses = map { $_ => 1 } @$addresses;
 
     my %addresses_added = ();
@@ -105,6 +157,7 @@ sub add_mesh_tests {
     $mesh_id =~ s/[^A-Za-z0-9_-]/_/g;
 
     my @tests = ();
+    my %test_types = ();
     foreach my $test (@$tests) {
         if ($test->disabled) {
             $logger->debug("Skipping disabled test: ".$test->description);
@@ -220,11 +273,73 @@ sub add_mesh_tests {
     
                 push @tests, @$res;
             }
+            
+            #track test types
+            $test_types{$test->parameters->type} = 1;
 
         };
         if ($@) {
             die("Problem adding test ".$test->description.": ".$@);
         }
+    }
+    
+    #add measurement archives
+    if($self->configure_archives()){
+        my $ma_map = {
+            "pinger" => {}, 
+            "perfsonarbuoy/owamp" => {}, 
+            "perfsonarbuoy/bwctl" => {}, 
+            "traceroute" => {}
+            };
+        foreach my $test_type(keys %test_types){
+            #lookup archive in explicit hosts and host classes. Append them all together if multiple match
+            my @archives = ();
+            if($local_host){
+                my $host_archive = $local_host->lookup_measurement_archive({ type => $test_type, recursive => 1 });
+                push @archives, $host_archive if($host_archive);
+            }
+            #lookup archives in host classes
+            foreach my $host_class(@{$host_classes}){
+                if($host_class->host_properties){
+                    my $hc_archive = $host_class->host_properties->lookup_measurement_archive({ type => $test_type, recursive => 1 });
+                    push @archives, $hc_archive if($hc_archive);
+                }
+            }
+            #lookup archives in requesting agent
+            if($requesting_agent){
+                 my $agent_archive = $requesting_agent->lookup_measurement_archive({ type => $test_type, recursive => 1 });
+                 push @archives, $agent_archive if($agent_archive);
+            }
+            
+            if(@archives < 1){
+                die("Unable to find measurement archive of type $test_type");
+            }
+            
+            #iterate through archives skipping duplicates (same URL + same type)
+            foreach my $archive(@archives){
+                next if $ma_map->{$test_type}->{$archive->write_url()};
+                my $archive_obj;
+                if ($test_type eq "pinger" || $test_type eq "perfsonarbuoy/owamp") {
+                    next if $ma_map->{'perfsonarbuoy/owamp'}->{$archive->write_url()} || $ma_map->{'pinger'}->{$archive->write_url()};
+                    $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondLatency();
+                    foreach my $summ(@{$default_summaries->{'latency'}}){
+                        push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
+                    }
+                }elsif ($test_type eq "traceroute") {
+                    $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondTraceroute();
+                }elsif ($test_type eq "perfsonarbuoy/bwctl") {
+                    $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondThroughput();
+                    foreach my $summ(@{$default_summaries->{'throughput'}}){
+                        push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
+                    }
+                }
+                $archive_obj->database($archive->write_url());
+                $archive_obj->added_by_mesh(1);
+                push @{ $self->regular_testing_conf->measurement_archives }, $archive_obj;
+                $ma_map->{$test_type}->{$archive->write_url()} = 1;
+            }
+        }
+        
     }
 
     push @{ $self->regular_testing_conf->tests }, @tests;
@@ -258,7 +373,11 @@ sub __build_tests {
         my ($schedule, $parameters);
 
         if ($test->parameters->type eq "pinger") {
-            $parameters = perfSONAR_PS::RegularTesting::Tests::Bwping->new();
+            if($self->use_bwctl2){
+                $parameters = perfSONAR_PS::RegularTesting::Tests::Bwping2->new();
+            }else{
+                $parameters = perfSONAR_PS::RegularTesting::Tests::Bwping->new();
+            }
 
             $parameters->packet_count($test->parameters->packet_count) if $test->parameters->packet_count;
             $parameters->packet_length($test->parameters->packet_size) if $test->parameters->packet_size;
@@ -269,9 +388,14 @@ sub __build_tests {
 
             $schedule   = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
             $schedule->interval($test->parameters->test_interval);
+            $schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
         }
         elsif ($test->parameters->type eq "traceroute") {
-            $parameters = perfSONAR_PS::RegularTesting::Tests::Bwtraceroute->new();
+            if($self->use_bwctl2){
+                $parameters = perfSONAR_PS::RegularTesting::Tests::Bwtraceroute2->new();
+            }else{
+                $parameters = perfSONAR_PS::RegularTesting::Tests::Bwtraceroute->new();
+            }
 
             $parameters->packet_length($test->parameters->packet_size) if $test->parameters->packet_size;
             $parameters->packet_first_ttl($test->parameters->first_ttl) if $test->parameters->first_ttl;
@@ -283,9 +407,15 @@ sub __build_tests {
 
             $schedule   = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
             $schedule->interval($test->parameters->test_interval) if $test->parameters->test_interval;
+            $schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
         }
         elsif ($test->parameters->type eq "perfsonarbuoy/bwctl") {
-            $parameters = perfSONAR_PS::RegularTesting::Tests::Bwctl->new();
+            if($self->use_bwctl2){
+                $parameters = perfSONAR_PS::RegularTesting::Tests::Bwctl2->new();
+            }else{
+                $parameters = perfSONAR_PS::RegularTesting::Tests::Bwctl->new();
+            }
+            
             if($test->parameters->tool){
                 my $tool = $test->parameters->tool;
                 $tool =~ s/^bwctl\///;
@@ -306,10 +436,15 @@ sub __build_tests {
 
             $schedule   = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
             $schedule->interval($test->parameters->interval) if $test->parameters->interval;
+            $schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
         }
         elsif ($test->parameters->type eq "perfsonarbuoy/owamp") {
             if ($self->force_bwctl_owamp) {
-                $parameters = perfSONAR_PS::RegularTesting::Tests::BwpingOwamp->new();
+                if($self->use_bwctl2){
+                    $parameters = perfSONAR_PS::RegularTesting::Tests::BwpingOwamp2->new();
+                }else{
+                    $parameters = perfSONAR_PS::RegularTesting::Tests::BwpingOwamp->new();
+                }
                 # Default to 25 second tests (could use sample_count, but the
                 # 300 number might push those into the deny category)
                 $parameters->packet_count(25/$test->parameters->packet_interval);
