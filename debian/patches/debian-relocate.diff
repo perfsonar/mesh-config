@@ -83,3 +83,39 @@
          check_interval => 28800,
          check_time_range => 86400,
          retry_interval => 600,
+--- a/etc/agent_configuration.conf
++++ b/etc/agent_configuration.conf
+@@ -45,7 +45,7 @@
+ ## Use the 'regular_testing_conf' variable to change the location of the
+ ## regular_testing.conf file that gets generated.  In a normal configuration,
+ ## these should be left as what's included below.
+-regular_testing_conf        /opt/perfsonar_ps/regular_testing/etc/regular_testing.conf 
++regular_testing_conf        /etc/regulartesting.conf 
+ 
+ ## Use the traceroute_master_conf, owmesh_conf and pinger_landmarks options to
+ ## specify the location of the files to write. In a normal configuration, these
+@@ -88,7 +88,7 @@
+ # should be restarted after their configuration is updated. If the
+ # 'use_toolkit' variable below is set to 0, you will need to use the
+ # 'cron-restart_services' cron script included in
+-# /opt/perfsonar_ps/mesh_config/doc to restart the services.
++# /usr/share/doc/perfsonar-meshconfig-agent/ to restart the services.
+ restart_services             1
+ 
+ # The 'use_toolkit' option can be used to specify whether the agent should use
+@@ -98,7 +98,7 @@
+ # all writable by user 'perfsonar'. The 'perfsonar' user cannot restart the
+ # services so you will need to disable 'restart_services' above, and use the
+ # 'cron-restart_services' cron script included in
+-# /opt/perfsonar_ps/mesh_config/doc to restart the services.
++# /usr/share/doc/perfsonar-meshconfig-agent/ to restart the services.
+ use_toolkit                  1
+ 
+ # The 'send_error_emails' option can be used to tell the agent to send an email
+--- a/doc/cron-restart_services
++++ b/doc/cron-restart_services
+@@ -1,3 +1,3 @@
+ MAILTO=root
+ # 10 minutes after the mesh configuration agent has run, restart regular_testing 
+-10 2 * * * root /etc/init.d/regular_testing restart
++10 2 * * * root /etc/init.d/perfsonar-regulartesting restart
