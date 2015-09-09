@@ -90,7 +90,7 @@
  ## regular_testing.conf file that gets generated.  In a normal configuration,
  ## these should be left as what's included below.
 -regular_testing_conf        /opt/perfsonar_ps/regular_testing/etc/regular_testing.conf 
-+regular_testing_conf        /etc/regulartesting.conf 
++regular_testing_conf        /etc/perfsonar/regulartesting.conf 
  
  ## Use the traceroute_master_conf, owmesh_conf and pinger_landmarks options to
  ## specify the location of the files to write. In a normal configuration, these
