@@ -1,5 +1,5 @@
-perfsonar-meshconfig (3.5~8.rc2-3) perfsonar-wheezy-staging; urgency=low
+perfsonar-meshconfig (3.5~8.1.rc2-1) UNRELEASED; urgency=low
 
   * Port to Debian.
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Thu, 10 Sep 2015 17:45:06 +0000
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Fri, 18 Sep 2015 10:58:59 +0000
