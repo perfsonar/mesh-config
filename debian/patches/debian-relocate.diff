@@ -39,7 +39,7 @@
  <maddash_options>
      <perfsonarbuoy/owamp>
 -        check_command            /opt/perfsonar_ps/nagios/bin/check_owdelay.pl
-+        check_command            /usr/lib/perfsonar/bin/check_owdelay.pl
++        check_command            /usr/lib/nagios/plugins/check_owdelay.pl
          check_interval           1800
          check_time_range         900
          acceptable_loss_rate     0
@@ -48,7 +48,7 @@
      </owamp>
      <perfsonarbuoy/bwctl>
 -        check_command            /opt/perfsonar_ps/nagios/bin/check_throughput.pl
-+        check_command            /usr/lib/perfsonar/bin/check_throughput.pl
++        check_command            /usr/lib/nagios/plugins/check_throughput.pl
          check_interval           28800
          check_time_range         86400
          acceptable_throughput    900
@@ -65,21 +65,21 @@
  has 'configure_archives'     => (is => 'rw', isa => 'Bool', default=>0);
 --- a/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
 +++ b/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-@@ -567,7 +567,7 @@
+@@ -572,7 +572,7 @@
  
  my %maddash_default_check_options = (
      "perfsonarbuoy/owamp" => {
 -        check_command => "/opt/perfsonar_ps/nagios/bin/check_owdelay.pl",
-+        check_command => "/usr/lib/perfsonar/bin/check_owdelay.pl",
++        check_command => "/usr/lib/nagios/plugins/check_owdelay.pl",
          check_interval => 1800,
          check_time_range => 900,
          retry_interval => 600,
-@@ -581,7 +581,7 @@
+@@ -586,7 +586,7 @@
          ma_filter => [],
      },
      "perfsonarbuoy/bwctl" => {
 -        check_command => "/opt/perfsonar_ps/nagios/bin/check_throughput.pl",
-+        check_command => "/usr/lib/perfsonar/bin/check_throughput.pl",
++        check_command => "/usr/lib/nagios/plugins/check_throughput.pl",
          check_interval => 28800,
          check_time_range => 86400,
          retry_interval => 600,
@@ -90,7 +90,7 @@
  ## regular_testing.conf file that gets generated.  In a normal configuration,
  ## these should be left as what's included below.
 -regular_testing_conf        /opt/perfsonar_ps/regular_testing/etc/regular_testing.conf 
-+regular_testing_conf        /etc/perfsonar/regulartesting.conf 
++regular_testing_conf        /etc/perfsonar/regulartesting.conf
  
  ## Use the traceroute_master_conf, owmesh_conf and pinger_landmarks options to
  ## specify the location of the files to write. In a normal configuration, these
@@ -122,5 +122,5 @@
  MAILTO=root
 -# 10 minutes after the mesh configuration agent has run, restart regular_testing 
 -10 2 * * * root /etc/init.d/regular_testing restart
-+# 10 minutes after the mesh configuration agent has run, restart regulartesting 
++# 10 minutes after the mesh configuration agent has run, restart regulartesting
 +10 2 * * * root /etc/init.d/perfsonar-regulartesting restart
