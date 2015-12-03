@@ -123,4 +123,4 @@
 -# 10 minutes after the mesh configuration agent has run, restart regular_testing 
 -10 2 * * * root /etc/init.d/regular_testing restart
 +# 10 minutes after the mesh configuration agent has run, restart regulartesting
-+10 2 * * * root /etc/init.d/perfsonar-regulartesting restart
++10 2 * * * root /etc/init.d/perfsonar-regulartesting restart >/dev/null
