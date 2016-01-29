@@ -1,8 +1,8 @@
-perfsonar-meshconfig (3.5.1~0.a1-1~bpo70+1) UNRELEASED; urgency=low
+perfsonar-meshconfig (3.5.1~1.a1-1~bpo70+1) UNRELEASED; urgency=low
 
   * Backport to wheezy.
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Fri, 29 Jan 2016 22:17:58 +0000
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Fri, 29 Jan 2016 23:50:03 +0000
 
 perfsonar-meshconfig (3.5.0.1-1) perfsonar-wheezy-release; urgency=low
 
