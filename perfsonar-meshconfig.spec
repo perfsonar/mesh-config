@@ -1,27 +1,28 @@
-%define install_base /opt/perfsonar_ps/mesh_config
+%define install_base /usr/lib/perfsonar/
+%define config_base  /etc/perfsonar
+%define doc_base     /usr/share/doc
 
-%define crontab_1 cron-mesh_config_agent
-%define crontab_2 cron-mesh_config_gui_agent
+%define crontab_1 perfsonar-meshconfig-agent
+%define crontab_2 perfsonar-meshconfig-guiagent
 
-%define relnum 1 
-%define disttag pSPS
+%define relnum 0.0.a1 
 
-Name:			perl-perfSONAR_PS-MeshConfig
-Version:		3.5.0.1
-Release:		%{relnum}.%{disttag}
-Summary:		perfSONAR_PS Mesh Configuration Agent
+Name:			perfsonar-meshconfig
+Version:		3.5.1
+Release:		%{relnum}
+Summary:		perfSONAR Mesh Configuration Agent
 License:		Distributable, see LICENSE
 Group:			Development/Libraries
-URL:			http://search.cpan.org/dist/perfSONAR_PS-MeshConfig/
-Source0:		perfSONAR_PS-MeshConfig-%{version}.%{relnum}.tar.gz
+URL:			http://www.perfsonar.net
+Source0:		perfsonar-meshconfig-%{version}.%{relnum}.tar.gz
 BuildRoot:		%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:		noarch
 
 %description
 A package that pulls in all the Mesh Configuration RPMs.
 
-%package Shared
-Summary:		perfSONAR_PS Mesh Configuration Shared Components
+%package shared
+Summary:		perfSONAR Mesh Configuration Shared Components
 Group:			Applications/Communications
 Requires:		perl
 Requires:		perl(Config::General)
@@ -59,103 +60,149 @@ Requires:		perl(warnings)
 Requires:		coreutils
 Requires:		chkconfig
 Requires:		shadow-utils
-%description Shared
+Requires:       libperfsonar-perl
+Obsoletes:      perl-perfSONAR_PS-MeshConfig-Shared
+Provides:       perl-perfSONAR_PS-MeshConfig-Shared
+%description shared
 This package is the set of library files shared RPMs by the perfSONAR Mesh
 Configuration agents.
 
-%package Agent
-Summary:		perfSONAR_PS Mesh Configuration Agent
+%package agent
+Summary:		perfSONAR Mesh Configuration Agent
 Group:			Applications/Communications
-Requires:		perl-perfSONAR_PS-MeshConfig-Shared
-%description Agent
-The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
+Requires:		perfsonar-meshconfig-shared
+Requires:       libperfsonar-toolkit-perl
+Requires:       libperfsonar-regulartesting-perl
+Obsoletes:      perl-perfSONAR_PS-MeshConfig-Agent
+Provides:       perl-perfSONAR_PS-MeshConfig-Agent
+%description agent
+The perfSONAR Mesh Configuration Agent downloads a centralized JSON file
 describing the tests to run, and uses it to generate appropriate configuration
 for the various services.
 
-%package JSONBuilder
-Summary:		perfSONAR_PS Mesh Configuration JSON Builder
+%package jsonbuilder
+Summary:		perfSONAR Mesh Configuration JSON Builder
 Group:			Applications/Communications
-Requires:		perl-perfSONAR_PS-MeshConfig-Shared
-%description JSONBuilder
-The perfSONAR-PS Mesh Configuration JSON Builder is used to convert the Mesh
+Requires:		perfsonar-meshconfig-shared
+Requires:		libperfsonar-sls-perl
+Obsoletes:      perl-perfSONAR_PS-MeshConfig-JSONBuilder
+Provides:       perl-perfSONAR_PS-MeshConfig-JSONBuilder
+%description jsonbuilder
+The perfSONAR Mesh Configuration JSON Builder is used to convert the Mesh
 .conf file format into a properly formed JSON file for agents to consume.
 
 
-%package GUIAgent
-Summary:		perfSONAR_PS Mesh Configuration GUI Agent
+%package guiagent
+Summary:		perfSONAR Mesh Configuration GUI Agent
 Group:			Applications/Communications
-Requires:		perl-perfSONAR_PS-MeshConfig-Shared
+Requires:		perfsonar-meshconfig-shared
 Requires:		maddash-server
-%description GUIAgent
-The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
+Requires:       nagios-plugins-perfsonar
+Requires:       libperfsonar-toolkit-perl
+Obsoletes:      perl-perfSONAR_PS-MeshConfig-GUIAgent
+Provides:       perl-perfSONAR_PS-MeshConfig-GUIAgent
+%description guiagent
+The perfSONAR Mesh Configuration Agent downloads a centralized JSON file
 describing the tests a mesh is running, and generates a MaDDash configuration.
 
-%pre Shared
+%pre shared
 /usr/sbin/groupadd perfsonar 2> /dev/null || :
 /usr/sbin/useradd -g perfsonar -r -s /sbin/nologin -c "perfSONAR User" -d /tmp perfsonar 2> /dev/null || :
 
 %prep
-%setup -q -n perfSONAR_PS-MeshConfig-%{version}.%{relnum}
+%setup -q -n perfsonar-meshconfig-%{version}.%{relnum}
 
 %build
 
 %install
 rm -rf %{buildroot}
 
-make ROOTPATH=%{buildroot}/%{install_base} rpminstall
+make ROOTPATH=%{buildroot}/%{install_base} CONFIGPATH=%{buildroot}/%{config_base} install
 
-install -D -m 0600 scripts/%{crontab_1} %{buildroot}/etc/cron.d/%{crontab_1}
-install -D -m 0600 scripts/%{crontab_2} %{buildroot}/etc/cron.d/%{crontab_2}
+install -D -m 0600 %{buildroot}/%{install_base}/scripts/%{crontab_1} %{buildroot}/etc/cron.d/%{crontab_1}
+install -D -m 0600 %{buildroot}/%{install_base}/scripts/%{crontab_2} %{buildroot}/etc/cron.d/%{crontab_2}
+rm -rf %{buildroot}/%{install_base}/scripts/
+
+install -D -m 0644 %{buildroot}/%{install_base}/doc/cron-lookup_hosts %{buildroot}/%{doc_base}/perfsonar-meshconfig-jsonbuilder/cron-lookup_hosts
+install -D -m 0644 %{buildroot}/%{install_base}/doc/example.conf %{buildroot}/%{doc_base}/perfsonar-meshconfig-jsonbuilder/example.conf
+install -D -m 0644 %{buildroot}/%{install_base}/doc/example.json %{buildroot}/%{doc_base}/perfsonar-meshconfig-jsonbuilder/example.json
+install -D -m 0644 %{buildroot}/%{install_base}/doc/cron-restart_gui_services %{buildroot}/%{doc_base}/perfsonar-meshconfig-guiagent/cron-restart_gui_services
+install -D -m 0644 %{buildroot}/%{install_base}/doc/cron-restart_services %{buildroot}/%{doc_base}/perfsonar-meshconfig-agent/cron-restart_services
+rm -rf %{buildroot}/%{install_base}/doc
 
 %clean
 rm -rf %{buildroot}
 
 %post
-mkdir -p /var/lib/perfsonar/mesh_config
-chown perfsonar:perfsonar /var/lib/perfsonar/mesh_config
+mkdir -p /var/lib/perfsonar/meshconfig
+chown perfsonar:perfsonar /var/lib/perfsonar/meshconfig
 
-%files Shared
+%post jsonbuilder
+if [ "$1" = "1" ]; then
+    # clean install, check for pre 3.5.1 files
+    if [ -e "/opt/perfsonar_ps/mesh_config/etc/lookup_hosts.conf" ]; then
+        mv %{config_base}/meshconfig-lookuphosts.conf %{config_base}/meshconfig-lookuphosts.conf.default
+        mv /opt/perfsonar_ps/mesh_config/etc/lookup_hosts.conf %{config_base}/meshconfig-lookuphosts.conf
+    fi
+fi
+
+%post agent
+if [ "$1" = "1" ]; then
+    # clean install, check for pre 3.5.1 files
+    if [ -e "/opt/perfsonar_ps/mesh_config/etc/agent_configuration.conf" ]; then
+        mv %{config_base}/meshconfig-agent.conf %{config_base}/meshconfig-agent.conf.default
+        mv /opt/perfsonar_ps/mesh_config/etc/agent_configuration.conf %{config_base}/meshconfig-agent.conf
+    fi
+fi
+
+%post guiagent
+
+if [ "$1" = "1" ]; then
+    # clean install, check for pre 3.5.1 files
+    if [ -e "/opt/perfsonar_ps/mesh_config/etc/gui_agent_configuration.conf" ]; then
+        mv %{config_base}/meshconfig-guiagent.conf %{config_base}/meshconfig-guiagent.conf.default
+        mv /opt/perfsonar_ps/mesh_config/etc/gui_agent_configuration.conf %{config_base}/meshconfig-guiagent.conf
+        sed -i "s:/opt/perfsonar_ps/nagios/bin:/usr/lib/nagios/plugins:g" %{config_base}/meshconfig-guiagent.conf
+    fi
+    
+    #Correct paths on x86_64 hosts
+    if [ -d "/usr/lib64/nagios/plugins" ]; then
+        sed -i "s:/usr/lib/nagios/plugins:/usr/lib64/nagios/plugins:g" %{config_base}/meshconfig-guiagent.conf
+    fi
+fi
+
+%files shared
 %defattr(0644,perfsonar,perfsonar,0755)
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Utils.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Config
-%{install_base}/lib/perfSONAR_PS/NPToolkit
-%{install_base}/lib/perfSONAR_PS/Utils
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/Base.pm
-%{install_base}/lib/Net/NTP.pm
 
-%files JSONBuilder
+%files jsonbuilder
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/build_json
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/validate_json
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/validate_configuration
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/lookup_hosts
-%doc %{install_base}/doc/example.conf
-%doc %{install_base}/doc/example.json
-%doc %{install_base}/doc/cron-lookup_hosts
-%{install_base}/etc/lookup_hosts.conf
-%{install_base}/lib/SimpleLookupService
-%{install_base}/lib/perfSONAR_PS/Client/LS
+%config(noreplace) %{config_base}/meshconfig-lookuphosts.conf
+%doc %{doc_base}/perfsonar-meshconfig-jsonbuilder/example.conf
+%doc %{doc_base}/perfsonar-meshconfig-jsonbuilder/example.json
+%doc %{doc_base}/perfsonar-meshconfig-jsonbuilder/cron-lookup_hosts
 
-
-%files Agent
+%files agent
 %defattr(0644,perfsonar,perfsonar,0755)
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/generate_configuration
-%config(noreplace) %{install_base}/etc/agent_configuration.conf
+%config(noreplace) %{config_base}/meshconfig-agent.conf
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Agent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm
-%{install_base}/lib/perfSONAR_PS/RegularTesting
-%{install_base}/scripts/cron-mesh_config_agent
-%doc %{install_base}/doc/INSTALL
-%doc %{install_base}/doc/cron-restart_services
+%doc %{doc_base}/perfsonar-meshconfig-agent/cron-restart_services
 %attr(0644,root,root) /etc/cron.d/%{crontab_1}
 
-%files GUIAgent
+%files guiagent
 %defattr(0644,perfsonar,perfsonar,0755)
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/generate_gui_configuration
-%config(noreplace) %{install_base}/etc/gui_agent_configuration.conf
+%config(noreplace) %{config_base}/meshconfig-guiagent.conf
 %{install_base}/lib/perfSONAR_PS/MeshConfig/GUIAgent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-%{install_base}/scripts/cron-mesh_config_gui_agent
-%doc %{install_base}/doc/cron-restart_gui_services
+%doc %{doc_base}/perfsonar-meshconfig-guiagent/cron-restart_gui_services
 %attr(0644,root,root) /etc/cron.d/%{crontab_2}
 
 %changelog
