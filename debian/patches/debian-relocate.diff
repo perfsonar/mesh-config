@@ -4,8 +4,8 @@
  
  Log::Log4perl->easy_init($DEBUG);
  
--my $CONFIG_FILE = "$RealBin/../etc/agent_configuration.conf";
-+my $CONFIG_FILE = "/etc/perfsonar/agentconfiguration.conf";
+-my $CONFIG_FILE = "$RealBin/../etc/meshconfig-agent.conf";
++my $CONFIG_FILE = "/etc/perfsonar/meshconfig-agent.conf";
  my $ADDRESS;
  my $LOGGER_CONF;
  my $DEBUGFLAG;
@@ -15,43 +15,11 @@
  
  Log::Log4perl->easy_init($DEBUG);
  
--my $CONFIG_FILE = "$RealBin/../etc/gui_agent_configuration.conf";
-+my $CONFIG_FILE = "/etc/perfsonar/guiagentconfiguration.conf";
+-my $CONFIG_FILE = "$RealBin/../etc/meshconfig-guiagent.conf";
++my $CONFIG_FILE = "/etc/perfsonar/meshconfig-guiagent.conf";
  my $LOGGER_CONF;
  my $DEBUGFLAG;
  my $HELP;
---- a/scripts/cron-mesh_config_agent
-+++ b/scripts/cron-mesh_config_agent
-@@ -1,2 +1,2 @@
- MAILTO=root
--0 2 * * * perfsonar /opt/perfsonar_ps/mesh_config/bin/generate_configuration &> /var/log/perfsonar/mesh_configuration_agent.log
-+0 2 * * * perfsonar /usr/lib/perfsonar/bin/generate_configuration &> /var/log/perfsonar/mesh_configuration_agent.log
---- a/scripts/cron-mesh_config_gui_agent
-+++ b/scripts/cron-mesh_config_gui_agent
-@@ -1,2 +1,2 @@
- MAILTO=root
--0 2 * * * perfsonar /opt/perfsonar_ps/mesh_config/bin/generate_gui_configuration &> /var/log/perfsonar/mesh_configuration_gui_agent.log
-+0 2 * * * perfsonar /usr/lib/perfsonar/bin/generate_gui_configuration &> /var/log/perfsonar/mesh_configuration_gui_agent.log
---- a/etc/gui_agent_configuration.conf
-+++ b/etc/gui_agent_configuration.conf
-@@ -75,7 +75,7 @@
- # the mesh, these will be used.
- <maddash_options>
-     <perfsonarbuoy/owamp>
--        check_command            /opt/perfsonar_ps/nagios/bin/check_owdelay.pl
-+        check_command            /usr/lib/nagios/plugins/check_owdelay.pl
-         check_interval           1800
-         check_time_range         900
-         acceptable_loss_rate     0
-@@ -83,7 +83,7 @@
-         retry_attempts 1
-     </owamp>
-     <perfsonarbuoy/bwctl>
--        check_command            /opt/perfsonar_ps/nagios/bin/check_throughput.pl
-+        check_command            /usr/lib/nagios/plugins/check_throughput.pl
-         check_interval           28800
-         check_time_range         86400
-         acceptable_throughput    900
 --- a/lib/perfSONAR_PS/MeshConfig/Agent.pm
 +++ b/lib/perfSONAR_PS/MeshConfig/Agent.pm
 @@ -37,7 +37,7 @@
@@ -83,8 +51,8 @@
          check_interval => 28800,
          check_time_range => 86400,
          retry_interval => 600,
---- a/etc/agent_configuration.conf
-+++ b/etc/agent_configuration.conf
+--- a/etc/meshconfig-agent.conf
++++ b/etc/meshconfig-agent.conf
 @@ -45,7 +45,7 @@
  ## Use the 'regular_testing_conf' variable to change the location of the
  ## regular_testing.conf file that gets generated.  In a normal configuration,
@@ -94,33 +62,11 @@
  
  ## Use the traceroute_master_conf, owmesh_conf and pinger_landmarks options to
  ## specify the location of the files to write. In a normal configuration, these
-@@ -88,8 +88,8 @@
- # should be restarted after their configuration is updated. If the
- # 'use_toolkit' variable below is set to 0, you will need to use the
- # 'cron-restart_services' cron script included in
--# /opt/perfsonar_ps/mesh_config/doc to restart the services.
--restart_services             1
-+# /usr/share/doc/perfsonar-meshconfig-agent/ to restart the services.
-+restart_services             0
- 
- # The 'use_toolkit' option can be used to specify whether the agent should use
- # the pS-Performance Toolkit's configuration daemon to save the configuration,
-@@ -98,8 +98,8 @@
- # all writable by user 'perfsonar'. The 'perfsonar' user cannot restart the
- # services so you will need to disable 'restart_services' above, and use the
- # 'cron-restart_services' cron script included in
--# /opt/perfsonar_ps/mesh_config/doc to restart the services.
--use_toolkit                  1
-+# /usr/share/doc/perfsonar-meshconfig-agent/ to restart the services.
-+use_toolkit                  0
- 
- # The 'send_error_emails' option can be used to tell the agent to send an email
- # (via sendmail) when an error occurs. These emails will be sent to the
 --- a/doc/cron-restart_services
 +++ b/doc/cron-restart_services
 @@ -1,3 +1,3 @@
  MAILTO=root
 -# 10 minutes after the mesh configuration agent has run, restart regular_testing 
--10 2 * * * root /etc/init.d/regular_testing restart
+-10 2 * * * root /etc/init.d/perfsonar-regulartesting restart
 +# 10 minutes after the mesh configuration agent has run, restart regulartesting
 +10 2 * * * root /etc/init.d/perfsonar-regulartesting restart >/dev/null
