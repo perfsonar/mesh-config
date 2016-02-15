@@ -1,8 +1,8 @@
 perfsonar-meshconfig (3.5.1~2.rc1-1) UNRELEASED; urgency=low
 
-  * To be filled in...
+  * Port to Jessie.
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Fri, 29 Jan 2016 23:51:47 +0000
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Mon, 15 Feb 2016 19:37:03 +0000
 
 perfsonar-meshconfig (3.5-1) perfsonar-wheezy-release; urgency=low
 
