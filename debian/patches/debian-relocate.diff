@@ -20,48 +20,6 @@
  my $LOGGER_CONF;
  my $DEBUGFLAG;
  my $HELP;
---- a/lib/perfSONAR_PS/MeshConfig/Agent.pm
-+++ b/lib/perfSONAR_PS/MeshConfig/Agent.pm
-@@ -37,7 +37,7 @@
- 
- has 'meshes'                 => (is => 'rw', isa => 'ArrayRef[HashRef]', default => sub { [] });
- 
--has 'regular_testing_conf'   => (is => 'rw', isa => 'Str', default => "/opt/perfsonar_ps/regular_testing/etc/regular_testing.conf");
-+has 'regular_testing_conf'   => (is => 'rw', isa => 'Str', default => "/etc/perfsonar/regulartesting.conf");
- has 'force_bwctl_owamp'      => (is => 'rw', isa => 'Bool', default => 0);
- has 'use_bwctl2'             => (is => 'rw', isa => 'Bool', default=>0);
- has 'configure_archives'     => (is => 'rw', isa => 'Bool', default=>0);
---- a/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-+++ b/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-@@ -572,7 +572,7 @@
- 
- my %maddash_default_check_options = (
-     "perfsonarbuoy/owamp" => {
--        check_command => "/opt/perfsonar_ps/nagios/bin/check_owdelay.pl",
-+        check_command => "/usr/lib/nagios/plugins/check_owdelay.pl",
-         check_interval => 1800,
-         check_time_range => 900,
-         retry_interval => 600,
-@@ -586,7 +586,7 @@
-         ma_filter => [],
-     },
-     "perfsonarbuoy/bwctl" => {
--        check_command => "/opt/perfsonar_ps/nagios/bin/check_throughput.pl",
-+        check_command => "/usr/lib/nagios/plugins/check_throughput.pl",
-         check_interval => 28800,
-         check_time_range => 86400,
-         retry_interval => 600,
---- a/etc/meshconfig-agent.conf
-+++ b/etc/meshconfig-agent.conf
-@@ -45,7 +45,7 @@
- ## Use the 'regular_testing_conf' variable to change the location of the
- ## regular_testing.conf file that gets generated.  In a normal configuration,
- ## these should be left as what's included below.
--regular_testing_conf        /opt/perfsonar_ps/regular_testing/etc/regular_testing.conf 
-+regular_testing_conf        /etc/perfsonar/regulartesting.conf
- 
- ## Use the traceroute_master_conf, owmesh_conf and pinger_landmarks options to
- ## specify the location of the files to write. In a normal configuration, these
 --- a/doc/cron-restart_services
 +++ b/doc/cron-restart_services
 @@ -1,3 +1,3 @@
