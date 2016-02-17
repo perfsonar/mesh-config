@@ -5,7 +5,7 @@
 %define crontab_1 perfsonar-meshconfig-agent
 %define crontab_2 perfsonar-meshconfig-guiagent
 
-%define relnum 0.1.rc1 
+%define relnum 0.3.rc1 
 
 Name:			perfsonar-meshconfig
 Version:		3.5.1
@@ -155,6 +155,8 @@ if [ "$1" = "1" ]; then
         mv /opt/perfsonar_ps/mesh_config/etc/agent_configuration.conf %{config_base}/meshconfig-agent.conf
     fi
 fi
+#update regular_testing.conf path
+sed -i "s:/opt/perfsonar_ps/regular_testing/etc/regular_testing.conf:/etc/perfsonar/regulartesting.conf:g" %{config_base}/meshconfig-agent.conf
 
 %post guiagent
 
@@ -170,6 +172,9 @@ if [ "$1" = "1" ]; then
     if [ -d "/usr/lib64/nagios/plugins" ]; then
         sed -i "s:/usr/lib/nagios/plugins:/usr/lib64/nagios/plugins:g" %{config_base}/meshconfig-guiagent.conf
     fi
+    
+    #Fix graph URL
+    sed -i "s:/serviceTest:/perfsonar-graphs:g" %{config_base}/meshconfig-guiagent.conf
 fi
 
 %files shared
