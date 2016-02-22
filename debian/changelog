@@ -1,14 +1,16 @@
-perfsonar-meshconfig (3.5.1~3.rc1-1~bpo70+1) UNRELEASED; urgency=low
+perfsonar-meshconfig (3.5.1~3.rc1-2~bpo70+1) perfsonar-wheezy-release; urgency=low
 
-  * Backport to Wheezy
+  * Backport to Wheezy.
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Wed, 17 Feb 2016 21:54:56 +0000
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Mon, 22 Feb 2016 23:15:48 +0000
 
-perfsonar-meshconfig (3.5.1~3.rc1-1) UNRELEASED; urgency=low
+perfsonar-meshconfig (3.5.1~3.rc1-2) perfsonar-jessie-release; urgency=low
 
   * Port to Jessie.
+  * Renaming configuration files to meshconfig-agent.conf
+    and meshconfig-guiagent.conf
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Wed, 17 Feb 2016 21:50:42 +0000
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Mon, 22 Feb 2016 23:11:53 +0000
 
 perfsonar-meshconfig (3.5-1) perfsonar-wheezy-release; urgency=low
 
