@@ -1,14 +1,14 @@
-perfsonar-meshconfig (3.5.1.1-1~0~bpo70+1) UNRELEASED; urgency=low
+perfsonar-meshconfig (3.5.1-2~bpo70+1) perfsonar-wheezy-release; urgency=low
 
-  * Backport to Wheezy.
+  * Backport to Wheezy
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Sun, 06 Mar 2016 13:30:48 +0100
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Tue, 22 Mar 2016 15:44:07 +0000
 
-perfsonar-meshconfig (3.5.1.1-1~0) UNRELEASED; urgency=low
+perfsonar-meshconfig (3.5.1-2) perfsonar-jessie-release; urgency=low
 
-  * New upstream version.
+  * Adding libperfsonar-toolkit-perl dependency
 
- -- Antoine Delvaux <adelvaux@man.poznan.pl>  Sat, 05 Mar 2016 11:03:40 +0100
+ -- Antoine Delvaux <adelvaux@man.poznan.pl>  Tue, 22 Mar 2016 15:38:59 +0000
 
 perfsonar-meshconfig (3.5.1-1) perfsonar-jessie-release; urgency=low
 
