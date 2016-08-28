@@ -5,10 +5,10 @@
 %define crontab_1 perfsonar-meshconfig-agent
 %define crontab_2 perfsonar-meshconfig-guiagent
 
-%define relnum 1 
+%define relnum 0.1.rc1 
 
 Name:			perfsonar-meshconfig
-Version:		3.5.1.2
+Version:		4.0
 Release:		%{relnum}%{?dist}
 Summary:		perfSONAR Mesh Configuration Agent
 License:		Distributable, see LICENSE
@@ -73,9 +73,11 @@ Group:			Applications/Communications
 Requires:		perfsonar-meshconfig-shared
 Requires:       libperfsonar-perl
 Requires:       libperfsonar-toolkit-perl
-Requires:       libperfsonar-regulartesting-perl
+Requires:       libperfsonar-pscheduler-perl
+Requires:       perl(Linux::Inotify2)
 Obsoletes:      perl-perfSONAR_PS-MeshConfig-Agent
 Provides:       perl-perfSONAR_PS-MeshConfig-Agent
+
 %description agent
 The perfSONAR Mesh Configuration Agent downloads a centralized JSON file
 describing the tests to run, and uses it to generate appropriate configuration
@@ -134,7 +136,7 @@ rm -rf %{buildroot}/%{install_base}/doc
 %clean
 rm -rf %{buildroot}
 
-%post
+%post shared
 mkdir -p /var/lib/perfsonar/meshconfig
 chown perfsonar:perfsonar /var/lib/perfsonar/meshconfig
 
@@ -197,6 +199,7 @@ fi
 %defattr(0644,perfsonar,perfsonar,0755)
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/generate_configuration
 %config(noreplace) %{config_base}/meshconfig-agent.conf
+%config(noreplace) %{config_base}/meshconfig-tasks.conf
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Agent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm
 %doc %{doc_base}/perfsonar-meshconfig-agent/cron-restart_services

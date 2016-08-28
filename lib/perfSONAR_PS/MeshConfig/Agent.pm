@@ -15,7 +15,6 @@ use FreezeThaw qw(freeze thaw);
 
 use perfSONAR_PS::Utils::Host qw(get_ips);
 use perfSONAR_PS::Utils::DNS qw(resolve_address reverse_dns);
-use perfSONAR_PS::NPToolkit::ConfigManager::Utils qw(restart_service save_file);
 
 use Data::Validate::Domain qw(is_hostname);
 use Data::Validate::IP qw(is_ipv4);
@@ -32,14 +31,9 @@ use Module::Load;
 
 use Moose;
 
-has 'use_toolkit'            => (is => 'rw', isa => 'Bool');
-has 'restart_services'       => (is => 'rw', isa => 'Bool');
-
 has 'meshes'                 => (is => 'rw', isa => 'ArrayRef[HashRef]', default => sub { [] });
 
-has 'regular_testing_conf'   => (is => 'rw', isa => 'Str', default => "/etc/perfsonar/regulartesting.conf");
-has 'force_bwctl_owamp'      => (is => 'rw', isa => 'Bool', default => 0);
-has 'use_bwctl2'             => (is => 'rw', isa => 'Bool', default=>0);
+has 'meshconfig_tasks_conf'   => (is => 'rw', isa => 'Str', default => "/etc/perfsonar/meshconfig-tasks.conf");
 has 'configure_archives'     => (is => 'rw', isa => 'Bool', default=>0);
 
 has 'addresses'              => (is => 'rw', isa => 'ArrayRef[Str]');
@@ -122,15 +116,11 @@ sub init {
     my ($self, @args) = @_;
     my $parameters = validate( @args, { 
                                          meshes => 1,
-                                         use_toolkit => 0,
-                                         restart_services => 0,
                                          requesting_agent_config => 0,
                                          validate_certificate => 0,
                                          ca_certificate_file => 0,
                                          ca_certificate_path => 0,
-                                         regular_testing_conf => 0,
-                                         force_bwctl_owamp    => 0,
-                                         use_bwctl2           => 0,
+                                         meshconfig_tasks_conf => 0,
                                          configure_archives   => 0,
                                          skip_redundant_tests => 0,
                                          addresses => 0,
@@ -274,13 +264,11 @@ sub __configure_host {
     }
 
     my $generator = perfSONAR_PS::MeshConfig::Generators::perfSONARRegularTesting->new();
-    my ($status, $res) = $generator->init({ config_file => $self->regular_testing_conf,
+    my ($status, $res) = $generator->init({ config_file => $self->meshconfig_tasks_conf,
                                             skip_duplicates => $self->skip_redundant_tests,
-                                            force_bwctl_owamp => $self->force_bwctl_owamp,
-                                            use_bwctl2 => $self->use_bwctl2,
                                             configure_archives => $self->configure_archives });
     if ($status != 0) {
-        my $msg = "Problem initializing Regular Testing configuration: ".$res;
+        my $msg = "Problem initializing Tasks configuration: ".$res;
         $logger->error($msg);
         $self->__add_error({ error_msg => $msg });
         return;
@@ -424,7 +412,7 @@ sub __configure_host {
                     $dont_change = 1;
                 }
 
-                my $msg = "Problem adding Regular Testing tests: $@";
+                my $msg = "Problem adding tasks: $@";
                 $logger->error($msg);
                 $self->__add_error({ mesh => $mesh, host => $hosts->[0], error_msg => $msg });
             }
@@ -440,18 +428,7 @@ sub __configure_host {
 
     my $config = $generator->get_config();
 
-    $status = $self->__write_file({ file => $self->regular_testing_conf, contents => $config });
-
-    if ($status and $self->restart_services) {
-        ($status, $res) = $self->__restart_service({ name => "regular_testing" });
-        if ($status != 0) {
-            my $msg = "Problem restarting Regular Testing: ".$res;
-            $logger->error($msg);
-            foreach my $mesh_params (@{ $self->meshes }) {
-                $self->__add_error({ mesh => $mesh_params->{mesh}, host => $mesh_params->{host}, error_msg => $msg });
-            }
-        }
-    }
+    $status = $self->__write_file({ file => $self->meshconfig_tasks_conf, contents => $config });
 
     return;
 }
@@ -488,17 +465,9 @@ sub __write_file {
     $logger->debug("Writing ".$file);
 
     eval {
-        if ($self->use_toolkit) {
-            my $res = save_file( { file => $file, content => $contents } );
-            if ( $res == -1 ) {
-                die("Couldn't save ".$file."via toolkit daemon");
-            }
-        } 
-        else {
-            open(FILE, ">".$file) or die("Couldn't open $file");
-            print FILE $contents;
-            close(FILE);
-        }
+        open(FILE, ">".$file) or die("Couldn't open $file");
+        print FILE $contents;
+        close(FILE);
     };
     if ($@) {
         my $msg = "Problem writing to $file: $@";
@@ -533,38 +502,6 @@ sub __compare_file {
     }
 
     return $differ;
-}
-
-sub __restart_service {
-    my ($self, @args) = @_;
-    my $parameters = validate( @args, { name => 1 } );
-    my $name  = $parameters->{name};
-
-    eval {
-        if ($self->use_toolkit) {
-            my $res = restart_service( { name => $name } );
-            if ( $res == -1 ) {
-                die("Couldn't restart service ".$name." via toolkit daemon");
-            }
-        }
-        else {
-            my $service_obj = get_service_object($name);
-            unless ($service_obj) {
-                my $msg = "Invalid service: $name";
-                $logger->error($msg);
-                die($msg);
-            }
-
-            die if ($service_obj->restart);
-        } 
-    };
-    if ($@) {
-        my $msg = "Problem restarting $name: $@";
-        $logger->error($msg);
-        return (-1, $msg);
-    }
-
-    return (0, "");
 }
 
 sub __get_addresses {
