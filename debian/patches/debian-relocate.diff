@@ -1,14 +1,3 @@
---- a/bin/generate_configuration
-+++ b/bin/generate_configuration
-@@ -16,7 +16,7 @@
- 
- Log::Log4perl->easy_init($DEBUG);
- 
--my $CONFIG_FILE = "$RealBin/../etc/meshconfig-agent.conf";
-+my $CONFIG_FILE = "/etc/perfsonar/meshconfig-agent.conf";
- my $ADDRESS;
- my $LOGGER_CONF;
- my $DEBUGFLAG;
 --- a/bin/generate_gui_configuration
 +++ b/bin/generate_gui_configuration
 @@ -16,7 +16,7 @@
@@ -20,11 +9,3 @@
  my $LOGGER_CONF;
  my $DEBUGFLAG;
  my $HELP;
---- a/doc/cron-restart_services
-+++ b/doc/cron-restart_services
-@@ -1,3 +1,3 @@
- MAILTO=root
--# 10 minutes after the mesh configuration agent has run, restart regular_testing 
--10 2 * * * root /etc/init.d/perfsonar-regulartesting restart
-+# 10 minutes after the mesh configuration agent has run, restart regulartesting
-+10 2 * * * root /etc/init.d/perfsonar-regulartesting restart >/dev/null
