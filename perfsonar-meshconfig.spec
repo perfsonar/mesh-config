@@ -5,7 +5,7 @@
 %define script_agent perfsonar-meshconfig-agent
 %define crontab_2 perfsonar-meshconfig-guiagent
 
-%define relnum 0.1.rc1 
+%define relnum 0.2.rc1 
 
 Name:			perfsonar-meshconfig
 Version:		4.0
@@ -216,6 +216,8 @@ if [ "$1" = "1" ]; then
     #Fix graph URL
     sed -i "s:/serviceTest:/perfsonar-graphs:g" %{config_base}/meshconfig-guiagent.conf
 fi
+#migrate to new graphs in 4.0
+sed -i "s:graphWidget.cgi::g" %{config_base}/meshconfig-guiagent.conf
 
 %preun agent
 %if 0%{?el7}
