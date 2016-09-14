@@ -1,9 +1,8 @@
 perfsonar-meshconfig (4.0~2.rc1-1) perfsonar-jessie-staging; urgency=low
 
   * New upstream version.
-  * TO BE FILLED IN...
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 14 Sep 2016 15:59:37 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 14 Sep 2016 16:31:19 +0000
 
 perfsonar-meshconfig (3.5.1.2-1) perfsonar-jessie-release; urgency=low
 
