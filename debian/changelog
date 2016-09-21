@@ -1,15 +1,15 @@
-perfsonar-meshconfig (4.0~2.rc1-1~bpo70+1) perfsonar-wheezy-staging; urgency=low
+perfsonar-meshconfig (4.0~2.rc1-2~bpo70+1) perfsonar-wheezy-staging; urgency=low
 
-  * Backport to Wheezy
+  * Backport to Wheezy.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 14 Sep 2016 16:25:30 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 21 Sep 2016 23:43:11 +0000
 
-perfsonar-meshconfig (4.0~2.rc1-1) perfsonar-jessie-staging; urgency=low
+perfsonar-meshconfig (4.0~2.rc1-2) perfsonar-jessie-staging; urgency=low
 
   * New upstream version.
-  * TO BE FILLED IN...
+  * Adding ${misc:Depends} as dependency.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 14 Sep 2016 15:59:37 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 21 Sep 2016 23:34:07 +0000
 
 perfsonar-meshconfig (3.5.1.2-1) perfsonar-jessie-release; urgency=low
 
