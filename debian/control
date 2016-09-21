@@ -3,7 +3,7 @@ Section: misc
 Priority: extra
 Maintainer: Antoine Delvaux <adelvaux@man.poznan.pl>
 Build-Depends: debhelper (>= 9.0.0)
-Standards-Version: 3.9.3
+Standards-Version: 3.9.6
 Homepage: http://www.perfsonar.net
 Vcs-Git: https://github.com/perfsonar/mesh-config
 Vcs-Browser: https://github.com/perfsonar/mesh-config
@@ -12,7 +12,7 @@ Package: perfsonar-meshconfig-shared
 Architecture: all
 Depends: perl, libperfsonar-perl, libclone-perl, libfreezethaw-perl,
  libjson-perl, liblog-log4perl-perl, libmoose-perl, libnet-ip-perl,
- libparams-validate-perl, liburi-perl
+ libparams-validate-perl, liburi-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig Shared
  This package is the set of library files shared by the perfSONAR Mesh
  Configuration agents.
@@ -22,7 +22,7 @@ Architecture: all
 Depends: perl, perfsonar-meshconfig-shared, libclone-perl,
  libconfig-general-perl, libdata-validate-domain-perl,
  libdata-validate-ip-perl, libjson-perl, liblog-log4perl-perl,
- libnet-ip-perl
+ libnet-ip-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig JSONBuilder
  The perfSONAR-PS Mesh Configuration JSON Builder is used to convert the Mesh
  .conf file format into a properly formed JSON file for agents to consume.
@@ -34,7 +34,7 @@ Depends: perl, perfsonar-meshconfig-shared, perfsonar-common,
  libdata-validate-ip-perl, libfreezethaw-perl, libjson-perl,
  liblog-log4perl-perl, libmime-lite-perl, libmoose-perl,
  libnet-ip-perl, libparams-validate-perl, liburi-perl,
- libperfsonar-toolkit-perl
+ libperfsonar-toolkit-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig Agent
  The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
  describing the tests to run, and uses it to generate appropriate configuration
@@ -46,7 +46,7 @@ Depends: perl, perfsonar-meshconfig-shared, perfsonar-common,
  libperfsonar-perl, libconfig-general-perl, libdata-validate-ip-perl,
  libjson-perl, liblog-log4perl-perl, libmime-lite-perl, libmoose-perl,
  libnet-ip-perl, libparams-validate-perl, liburi-perl, libyaml-perl,
- libperfsonar-toolkit-perl
+ libperfsonar-toolkit-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig GUIAgent
  The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
  describing the tests a mesh is running, and generates a MaDDash configuration.
