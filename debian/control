@@ -37,7 +37,7 @@ Depends: perl, perfsonar-meshconfig-shared, perfsonar-common,
  libperfsonar-toolkit-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig Agent
  The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
- describing the tests to run, and uses it to generate appropriate configuration
+ describing the tests to run and uses it to generate appropriate configuration
  for the various services.
 
 Package: perfsonar-meshconfig-guiagent
@@ -49,4 +49,4 @@ Depends: perl, perfsonar-meshconfig-shared, perfsonar-common,
  libperfsonar-toolkit-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig GUIAgent
  The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
- describing the tests a mesh is running, and generates a MaDDash configuration.
+ describing the tests a mesh is running and generates a MaDDash configuration.

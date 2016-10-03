@@ -1,4 +1,7 @@
 etc/meshconfig-agent.conf etc/perfsonar/
+etc/meshconfig-agent-logger.conf etc/perfsonar/
+etc/meshconfig-agent-tasks.conf etc/perfsonar/
+bin/perfsonar_meshconfig_agent usr/lib/perfsonar/bin
 lib/perfSONAR_PS/MeshConfig/Agent.pm usr/share/perl5/perfSONAR_PS/MeshConfig
 lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm usr/share/perl5/perfSONAR_PS/MeshConfig/Generators
 scripts/perfsonar-meshconfig-agent etc/cron.d/
