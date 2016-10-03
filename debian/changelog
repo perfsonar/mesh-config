@@ -6,7 +6,7 @@ perfsonar-meshconfig (4.0~2.rc1-4) perfsonar-jessie-staging; urgency=low
   * Adding a crontab entry for perfsonar-meshconfig-guiagent
   * Adding the /var/lib/perfsonar/meshconfig directory.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Mon, 03 Oct 2016 14:50:23 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Mon, 03 Oct 2016 15:06:20 +0000
 
 perfsonar-meshconfig (3.5.1.2-1) perfsonar-jessie-release; urgency=low
 
