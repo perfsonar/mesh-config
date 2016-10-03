@@ -17,7 +17,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="perfSONAR Mesh Config Agent"
 NAME=perfsonar-meshconfig-agent
-DAEMON=/usr/lib/perfsonar/bin/perfsonar-meshconfig-agent
+DAEMON=/usr/lib/perfsonar/bin/perfsonar_meshconfig_agent
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 CONFDIR=/etc/perfsonar
