@@ -1,7 +1,7 @@
 perfsonar-meshconfig (4.0~2.rc1-3) perfsonar-jessie-staging; urgency=low
 
   * New upstream version.
-  * Adding ${misc:Depends} as dependency.
+  * Adding ${misc:Depends} and pscheduler-server as dependencies.
   * Adding an init script and a service file for perfsonar-meshconfig-agent
   * Adding a crontab entry for perfsonar-meshconfig-guiagent
 
