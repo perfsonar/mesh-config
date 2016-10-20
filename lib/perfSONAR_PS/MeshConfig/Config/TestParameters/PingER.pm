@@ -23,12 +23,18 @@ override 'type' => sub { "pinger" };
 has 'packet_size'     => (is => 'rw', isa => 'Int');
 has 'packet_ttl'      => (is => 'rw', isa => 'Int');
 has 'packet_count'    => (is => 'rw', isa => 'Int');
-has 'packet_interval' => (is => 'rw', isa => 'Int');
+has 'packet_interval' => (is => 'rw', isa => 'Num');
 has 'test_interval'   => (is => 'rw', isa => 'Int');
 has 'ipv4_only'       => (is => 'rw', isa => 'Bool');
 has 'ipv6_only'       => (is => 'rw', isa => 'Bool');
 has 'force_bidirectional' => (is => 'rw', isa => 'Bool');
 has 'random_start_percentage' => (is => 'rw', isa => 'Int');
+#new pscheduler fields
+has 'flowlabel' => (is => 'rw', isa => 'Int');
+has 'hostnames' => (is => 'rw', isa => 'Bool');
+has 'suppress_loopback' => (is => 'rw', isa => 'Bool');
+has 'deadline' => (is => 'rw', isa => 'Int');
+has 'timeout' => (is => 'rw', isa => 'Int');
 
 1;
 
