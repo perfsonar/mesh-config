@@ -3,6 +3,3 @@ bin/build_json usr/lib/perfsonar/bin
 bin/lookup_hosts usr/lib/perfsonar/bin
 bin/validate_json usr/lib/perfsonar/bin
 bin/validate_configuration usr/lib/perfsonar/bin
-doc/cron-lookup_hosts usr/share/doc/perfsonar-meshconfig-jsonbuilder/examples/
-doc/example.conf usr/share/doc/perfsonar-meshconfig-jsonbuilder/examples
-doc/example.json usr/share/doc/perfsonar-meshconfig-jsonbuilder/examples

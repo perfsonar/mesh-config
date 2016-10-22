@@ -1,7 +1,6 @@
 etc/meshconfig-guiagent.conf etc/perfsonar/
-bin/generate_gui_configuration usr/lib/perfsonar/bin
-doc/cron-restart_gui_services usr/share/doc/perfsonar-meshconfig-guiagent/examples/
-scripts/perfsonar-meshconfig-guiagent etc/cron.d/
+etc/meshconfig-guiagent-logger.conf etc/perfsonar/
+bin/perfsonar_meshconfig_guiagent usr/lib/perfsonar/bin
+lib/perfSONAR_PS/MeshConfig/GUIAgent.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig
 lib/perfSONAR_PS/MeshConfig/Generators/MaDDash usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig/Generators
 lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig/Generators
-lib/perfSONAR_PS/MeshConfig/GUIAgent.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig
