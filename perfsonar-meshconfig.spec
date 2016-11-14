@@ -5,7 +5,7 @@
 %define script_agent perfsonar-meshconfig-agent
 %define script_guiagent perfsonar-meshconfig-guiagent
 
-%define relnum 0.5.rc2 
+%define relnum 0.6.rc2 
 
 Name:			perfsonar-meshconfig
 Version:		4.0
@@ -233,6 +233,11 @@ fi
 #migrate to new graphs in 4.0
 sed -i "s:graphWidget.cgi::g" %{config_base}/meshconfig-guiagent.conf
 %endif
+
+#make sure logs are setup properly
+sed -i "s:/var/log/perfsonar/:/var/log/maddash/:g" %{config_base}/meshconfig-guiagent-logger.conf
+unlink /var/log/perfsonar/meshconfig-guiagent.log &>/dev/null || :
+ln -s /var/log/maddash/meshconfig-guiagent.log /var/log/perfsonar/meshconfig-guiagent.log &>/dev/null || :
 
 %preun agent
 %if 0%{?el7}
