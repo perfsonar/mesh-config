@@ -22,7 +22,7 @@ Architecture: all
 Depends: perl, perfsonar-meshconfig-shared, libclone-perl,
  libconfig-general-perl, libdata-validate-domain-perl,
  libdata-validate-ip-perl, libjson-perl, liblog-log4perl-perl,
- libnet-ip-perl, ${misc:Depends}
+ libnet-ip-perl, libperfsonar-sls-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig JSONBuilder
  The perfSONAR-PS Mesh Configuration JSON Builder is used to convert the Mesh
  .conf file format into a properly formed JSON file for agents to consume.
