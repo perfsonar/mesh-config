@@ -48,7 +48,8 @@ Depends: perl, perfsonar-meshconfig-shared, perfsonar-common,
  libperfsonar-perl, libconfig-general-perl, libdata-validate-ip-perl,
  libjson-perl, liblog-log4perl-perl, libmime-lite-perl, libmoose-perl,
  libnet-ip-perl, libparams-validate-perl, liburi-perl, libyaml-perl,
- libperfsonar-toolkit-perl, ${misc:Depends}
+ liblinux-inotify2-perl, libperfsonar-toolkit-perl,
+ liblog-dispatch-filerotate-perl, ${misc:Depends}
 Description: perfSONAR MeshConfig GUIAgent
  The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
  describing the tests a mesh is running and generates a MaDDash configuration.
