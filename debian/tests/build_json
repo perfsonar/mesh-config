@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+zcat /usr/share/doc/perfsonar-meshconfig-jsonbuilder/examples/example.conf.gz \
+| grep -v include \
+| /usr/lib/perfsonar/bin/build_json \
+| grep -A 10 host_classes
