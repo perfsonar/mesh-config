@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+
+/usr/lib/perfsonar/bin/lookup_hosts --input /etc/perfsonar/meshconfig-lookuphosts.conf 2>/dev/null \
+| grep -C 10 organizations

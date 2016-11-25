@@ -1,3 +1,6 @@
+Depends: perfsonar-meshconfig-jsonbuilder
+Tests: lookup_hosts, build_json, validate_json, validate_configuration
+
 Depends: perfsonar-meshconfig-agent
 Tests: agent
 Restrictions: needs-root
