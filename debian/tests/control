@@ -1,0 +1,3 @@
+Depends: perfsonar-meshconfig-agent
+Tests: agent
+Restrictions: needs-root
