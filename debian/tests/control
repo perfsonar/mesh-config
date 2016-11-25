@@ -1,3 +1,7 @@
 Depends: perfsonar-meshconfig-agent
 Tests: agent
 Restrictions: needs-root
+
+Depends: perfsonar-meshconfig-guiagent
+Tests: guiagent
+Restrictions: needs-root
