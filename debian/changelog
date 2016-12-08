@@ -1,4 +1,4 @@
-perfsonar-meshconfig (4.0~6.rc2-1) perfsonar-jessie-staging; urgency=low
+perfsonar-meshconfig (4.0~6.rc2-2) perfsonar-jessie-staging; urgency=low
 
   * New upstream version.
   * Adding ${misc:Depends} and pscheduler-server as dependencies.
@@ -6,7 +6,7 @@ perfsonar-meshconfig (4.0~6.rc2-1) perfsonar-jessie-staging; urgency=low
   * Adding an init script and a service file for perfsonar-meshconfig-guiagent
   * Adding the /var/lib/perfsonar/meshconfig directory.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Mon, 14 Nov 2016 14:36:12 +0100
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Thu, 08 Dec 2016 21:52:46 +0000
 
 perfsonar-meshconfig (3.5.1.2-1) perfsonar-jessie-release; urgency=low
 
