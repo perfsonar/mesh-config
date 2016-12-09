@@ -23,11 +23,12 @@ case "$1" in
     purge)
         # Remove data directory
         rm -rf /var/lib/perfsonar/meshconfig
-        # Remove log
-        rm -rf /var/log/perfsonar/meshconfig-agent.log
+
+        # Remove logs
+        rm -f /var/log/perfsonar/meshconfig-agent.log*
     ;;
 
-    purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
         # Rename configuration files
         if dpkg-maintscript-helper supports mv_conffile; then
             dpkg-maintscript-helper mv_conffile \
