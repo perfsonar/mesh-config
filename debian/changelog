@@ -1,10 +1,10 @@
-perfsonar-meshconfig (4.0~6.rc2-2~bpo70+1) perfsonar-wheezy-staging; urgency=low
+perfsonar-meshconfig (4.0~7.rc2-1~bpo70+1) perfsonar-wheezy-staging; urgency=low
 
   * Backport to Wheezy.
 
  -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Thu, 08 Dec 2016 21:58:34 +0000
 
-perfsonar-meshconfig (4.0~6.rc2-2) perfsonar-jessie-staging; urgency=low
+perfsonar-meshconfig (4.0~7.rc2-1) perfsonar-jessie-staging; urgency=low
 
   * New upstream version.
   * Adding ${misc:Depends} and pscheduler-server as dependencies.
