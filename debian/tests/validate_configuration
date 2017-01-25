@@ -2,6 +2,5 @@
 
 set -e
 
-zcat /usr/share/doc/perfsonar-meshconfig-jsonbuilder/examples/example.json.gz \
-| sed '/include/,+2{d}' \
+sed '/include/,+2{d}' /usr/share/doc/perfsonar-meshconfig-jsonbuilder/examples/example.json \
 | /usr/lib/perfsonar/bin/validate_configuration --config_url=file:///dev/stdin
