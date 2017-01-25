@@ -27,12 +27,24 @@ case "$1" in
                 /etc/perfsonar/meshconfig-agent.conf \
                 3.5.1~3.rc1-2~ -- "$@"
         fi
+
         # Data directory
         mkdir -p /var/lib/perfsonar/meshconfig
         chown perfsonar:perfsonar /var/lib/perfsonar/meshconfig
+
+        # Generate configuration file if needed
+        if ! [ -e /etc/perfsonar/meshconfig-agent-tasks.conf ]; then
+            if [ -e /etc/perfsonar/meshconfig-agent-tasks.conf.dpkg-backup ]; then
+                mv /etc/perfsonar/meshconfig-agent-tasks.conf.dpkg-backup \
+                   /etc/perfsonar/meshconfig-agent-tasks.conf
+            else
+                zcat /usr/share/doc/perfsonar-meshconfig-agent/examples/meshconfig-agent-tasks.conf.gz \
+                     > /etc/perfsonar/meshconfig-agent-tasks.conf
+            fi
+        fi
+
         # Task configuration file need to be writable by perfsonar user
         chown perfsonar:perfsonar /etc/perfsonar/meshconfig-agent-tasks.conf
-
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
