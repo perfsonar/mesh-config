@@ -38,8 +38,8 @@ case "$1" in
                 mv /etc/perfsonar/meshconfig-agent-tasks.conf.dpkg-backup \
                    /etc/perfsonar/meshconfig-agent-tasks.conf
             else
-                zcat /usr/share/doc/perfsonar-meshconfig-agent/examples/meshconfig-agent-tasks.conf.gz \
-                     > /etc/perfsonar/meshconfig-agent-tasks.conf
+                cp /usr/share/doc/perfsonar-meshconfig-agent/examples/meshconfig-agent-tasks.conf \
+                   /etc/perfsonar/meshconfig-agent-tasks.conf
             fi
         fi
 
