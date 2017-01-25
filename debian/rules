@@ -10,4 +10,4 @@
 override_dh_auto_install:
 
 override_dh_compress:
-	dh_compress -X.conf
+	dh_compress -X.conf -X.json
