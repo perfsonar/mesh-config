@@ -1,14 +1,14 @@
-package perfSONAR_PS::MeshConfig::Config::TestParameters::PingER;
+package perfSONAR_PS::MeshConfig::Config::TestParameters::SimpleStream;
 use strict;
 use warnings;
 
-our $VERSION = 3.1;
+our $VERSION = 4.0;
 
 use Moose;
 
 =head1 NAME
 
-perfSONAR_PS::MeshConfig::Config::TestParameters::PingER;
+perfSONAR_PS::MeshConfig::Config::TestParameters::SimpleStream;
 
 =head1 DESCRIPTION
 
@@ -18,26 +18,21 @@ perfSONAR_PS::MeshConfig::Config::TestParameters::PingER;
 
 extends 'perfSONAR_PS::MeshConfig::Config::TestParameters::Base';
 
-override 'type' => sub { "pinger" };
+override 'type' => sub { "simplestream" };
 
-has 'packet_size'     => (is => 'rw', isa => 'Int');
-has 'packet_ttl'      => (is => 'rw', isa => 'Int');
-has 'packet_count'    => (is => 'rw', isa => 'Int');
-has 'packet_interval' => (is => 'rw', isa => 'Num');
-has 'test_interval'   => (is => 'rw', isa => 'Int');
-has 'ipv4_only'       => (is => 'rw', isa => 'Bool');
-has 'ipv6_only'       => (is => 'rw', isa => 'Bool');
-has 'force_bidirectional' => (is => 'rw', isa => 'Bool');
-has 'random_start_percentage' => (is => 'rw', isa => 'Int');
+has 'dawdle'                    => (is => 'rw', isa => 'Int');
+has 'fail'                      => (is => 'rw', isa => 'Num');
+has 'test_material'             => (is => 'rw', isa => 'Str', default => sub{ "testing123" });
+has 'timeout'                   => (is => 'rw', isa => 'Int',);
+#probably should be moved out to pscheduler superclass
+has 'tool' => (is => 'rw', isa => 'Str');
+has 'force_bidirectional'       => (is => 'rw', isa => 'Bool');
+has 'random_start_percentage'   => (is => 'rw', isa => 'Int');
 has 'slip' => (is => 'rw', isa => 'Int');
 has 'slip_randomize' => (is => 'rw', isa => 'Bool');
-#new pscheduler fields
-has 'flowlabel' => (is => 'rw', isa => 'Int');
-has 'hostnames' => (is => 'rw', isa => 'Bool');
-has 'suppress_loopback' => (is => 'rw', isa => 'Bool');
-has 'deadline' => (is => 'rw', isa => 'Int');
-has 'timeout' => (is => 'rw', isa => 'Int');
-has 'tos_bits'        => (is => 'rw', isa => 'Int');
+has 'interval'                  => (is => 'rw', isa => 'Int');
+has 'ipv4_only'       => (is => 'rw', isa => 'Bool');
+has 'ipv6_only'       => (is => 'rw', isa => 'Bool');
 
 1;
 

@@ -1,14 +1,15 @@
-package perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYOwamp;
+package perfSONAR_PS::MeshConfig::Config::Reference;
 use strict;
 use warnings;
 
-our $VERSION = 3.1;
+our $VERSION = 4.0;
 
 use Moose;
+use Params::Validate qw(:all);
 
 =head1 NAME
 
-perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYOwamp;
+perfSONAR_PS::MeshConfig::Config::Reference;
 
 =head1 DESCRIPTION
 
@@ -16,21 +17,10 @@ perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYOwamp;
 
 =cut
 
-extends 'perfSONAR_PS::MeshConfig::Config::TestParameters::Base';
+extends 'perfSONAR_PS::MeshConfig::Config::Base';
 
-override 'type' => sub { "perfsonarbuoy/owamp" };
-
-has 'bucket_width'    => (is => 'rw', isa => 'Num');
-has 'packet_interval' => (is => 'rw', isa => 'Num');
-has 'loss_threshold'  => (is => 'rw', isa => 'Int');
-has 'packet_padding'  => (is => 'rw', isa => 'Int');
-has 'session_count'   => (is => 'rw', isa => 'Int');
-has 'sample_count'    => (is => 'rw', isa => 'Int');
-has 'force_bidirectional' => (is => 'rw', isa => 'Bool');
-has 'ipv4_only'       => (is => 'rw', isa => 'Bool');
-has 'ipv6_only'       => (is => 'rw', isa => 'Bool');
-has 'output_raw'        => (is => 'rw', isa => 'Bool');
-has 'tos_bits'        => (is => 'rw', isa => 'Int');
+has 'name'     => (is => 'rw', isa => 'Str');
+has 'value'     => (is => 'rw', isa => 'Str');
 
 1;
 

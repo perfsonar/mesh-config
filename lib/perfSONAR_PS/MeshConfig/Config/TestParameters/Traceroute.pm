@@ -33,6 +33,8 @@ has 'ipv4_only'       => (is => 'rw', isa => 'Bool');
 has 'ipv6_only'       => (is => 'rw', isa => 'Bool');
 has 'force_bidirectional' => (is => 'rw', isa => 'Bool');
 has 'random_start_percentage' => (is => 'rw', isa => 'Int');
+has 'slip' => (is => 'rw', isa => 'Int');
+has 'slip_randomize' => (is => 'rw', isa => 'Bool');
 #new pscheduler fields
 has 'algorithm' => (is => 'rw', isa => 'Str');
 has 'as' => (is => 'rw', isa => 'Bool');
@@ -42,6 +44,7 @@ has 'probe_type' => (is => 'rw', isa => 'Str');
 has 'queries' => (is => 'rw', isa => 'Int');
 has 'sendwait' => (is => 'rw', isa => 'Int');
 has 'wait' => (is => 'rw', isa => 'Int');
+has 'tos_bits'        => (is => 'rw', isa => 'Int');
 
 1;
 

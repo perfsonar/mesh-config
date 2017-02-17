@@ -12,10 +12,12 @@ use perfSONAR_PS::MeshConfig::Config::Group;
 use perfSONAR_PS::MeshConfig::Config::MeasurementArchive;
 use perfSONAR_PS::MeshConfig::Config::Mesh;
 use perfSONAR_PS::MeshConfig::Config::ExpectedTestResults;
+use perfSONAR_PS::MeshConfig::Config::Reference;
 
 use perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYBwctl;
 use perfSONAR_PS::MeshConfig::Config::TestParameters::PerfSONARBUOYOwamp;
 use perfSONAR_PS::MeshConfig::Config::TestParameters::PingER;
+use perfSONAR_PS::MeshConfig::Config::TestParameters::SimpleStream;
 use perfSONAR_PS::MeshConfig::Config::TestParameters::Traceroute;
 
 =head1 NAME
@@ -40,6 +42,7 @@ has 'parameters'          => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Conf
 
 has 'expected_results'    => (is => 'rw', isa => 'ArrayRef[perfSONAR_PS::MeshConfig::Config::ExpectedTestResults]', default => sub { [] });
 
+has 'references'          => (is => 'rw', isa => 'ArrayRef[perfSONAR_PS::MeshConfig::Config::Reference]', default => sub { [] });
 has 'measurement_archives' => (is => 'rw', isa => 'ArrayRef[perfSONAR_PS::MeshConfig::Config::MeasurementArchive]', default => sub { [] });
 
 has 'parent'              => (is => 'rw', isa => 'perfSONAR_PS::MeshConfig::Config::Mesh');
@@ -90,6 +93,21 @@ sub lookup_measurement_archive {
     }
 
     return;
+}
+
+sub lookup_measurement_archives {
+    my ($self, @args) = @_;
+    my $parameters = validate( @args, { type => 1 } );
+    my $type       = $parameters->{type};
+    
+    my @measurement_archives = ();
+    foreach my $measurement_archive (@{ $self->measurement_archives }) {
+        if ($measurement_archive->type eq $type) {
+            push @measurement_archives, $measurement_archive;
+        }
+    }
+    
+    return \@measurement_archives;
 }
 
 sub lookup_address {

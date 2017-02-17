@@ -5,7 +5,7 @@
 %define script_agent perfsonar-meshconfig-agent
 %define script_guiagent perfsonar-meshconfig-guiagent
 
-%define relnum 0.7.rc2 
+%define relnum 0.9.rc3 
 
 Name:			perfsonar-meshconfig
 Version:		4.0
@@ -76,7 +76,8 @@ Configuration agents.
 %package agent
 Summary:		perfSONAR Mesh Configuration Agent
 Group:			Applications/Communications
-Requires:		perfsonar-meshconfig-shared
+Requires:		perfsonar-meshconfig-shared = %{version}-%{release}
+Requires(post):	perfsonar-meshconfig-shared = %{version}-%{release}
 Requires:       libperfsonar-perl
 Requires:       libperfsonar-toolkit-perl
 Requires:       libperfsonar-pscheduler-perl
@@ -106,7 +107,8 @@ The perfSONAR Mesh Configuration JSON Builder is used to convert the Mesh
 %package guiagent
 Summary:		perfSONAR Mesh Configuration GUI Agent
 Group:			Applications/Communications
-Requires:		perfsonar-meshconfig-shared
+Requires:		perfsonar-meshconfig-shared = %{version}-%{release}
+Requires(post):	perfsonar-meshconfig-shared = %{version}-%{release}
 Requires:		maddash-server
 Requires:       nagios-plugins-perfsonar
 Requires:       libperfsonar-toolkit-perl
