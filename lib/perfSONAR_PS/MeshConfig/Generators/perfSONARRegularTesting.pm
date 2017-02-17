@@ -15,6 +15,7 @@ use perfSONAR_PS::MeshConfig::Generators::Base;
 use perfSONAR_PS::RegularTesting::Utils::ConfigFile qw( parse_file save_string );
 
 use perfSONAR_PS::RegularTesting::Config;
+use perfSONAR_PS::RegularTesting::CreatedBy;
 use perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondLatency;
 use perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondThroughput;
 use perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondTraceroute;
@@ -97,7 +98,6 @@ sub init {
         my @new_archives = ();
         foreach my $archive (@{ $config->measurement_archives }) {
             next if ($archive->added_by_mesh);
-
             push @new_archives, $archive;
         }
 
@@ -119,24 +119,70 @@ sub init {
 
 sub add_mesh_tests {
     my ($self, @args) = @_;
-    my $parameters = validate( @args, { mesh => 1, tests => 1, addresses => 1, local_host => 1, host_classes => 1, requesting_agent => 1 } );
+    my $parameters = validate( @args, { mesh => 1, mesh_url => 1, tests => 1, addresses => 1, local_host => 1, host_classes => 1, requesting_agent => 1, configure_archives => 0 } );
     my $mesh   = $parameters->{mesh};
+    my $mesh_url   = $parameters->{mesh_url};
     my $tests  = $parameters->{tests};
     my $addresses = $parameters->{addresses};
     my $local_host = $parameters->{local_host};
     my $host_classes = $parameters->{host_classes};
     my $requesting_agent = $parameters->{requesting_agent};
+    my $configure_archives = ($parameters->{configure_archives} || (!defined $parameters->{configure_archives} && $self->configure_archives()));
     
+    #set created-by
+    my $created_by = new perfSONAR_PS::RegularTesting::CreatedBy({
+        'agent_type' => "remote-mesh",
+        'name' => $mesh->description,
+        'uri' => $mesh_url,
+    });
     
     my %host_addresses = map { $_ => 1 } @$addresses;
 
     my %addresses_added = ();
 
     my $mesh_id = $mesh->description;
-    $mesh_id =~ s/[^A-Za-z0-9_-]/_/g;
-
+    $mesh_id =~ s/[^A-Za-z0-9_-]/_/g if($mesh_id);
+    
+    #add measurement archives that apply to all tests setup by the mesh
+    my $ma_map = {
+            "pinger" => {}, 
+            "perfsonarbuoy/owamp" => {}, 
+            "perfsonarbuoy/bwctl" => {}, 
+            "traceroute" => {},
+            "simplestream" => {},
+            };
+    if($configure_archives){
+        foreach my $test_type(keys %{$ma_map}){
+            #lookup archive in explicit hosts and host classes. Append them all together if multiple match
+            my @archives = ();
+            if($local_host){
+                my $host_archives = $local_host->lookup_measurement_archives({ type => $test_type, recursive => 1 });
+                push @archives, @{$host_archives} if($host_archives);
+            }
+            #lookup archives in host classes
+            foreach my $host_class(@{$host_classes}){
+                if($host_class->host_properties){
+                    my $hc_archives = $host_class->host_properties->lookup_measurement_archives({ type => $test_type, recursive => 1 });
+                    push @archives, @{$hc_archives} if($hc_archives);
+                }
+            }
+            #lookup archives in requesting agent
+            if($requesting_agent){
+                 my $agent_archives = $requesting_agent->lookup_measurement_archives({ type => $test_type, recursive => 1 });
+                 push @archives, @{$agent_archives} if($agent_archives);
+            }
+            
+            #iterate through archives skipping duplicates (same URL + same type)
+            foreach my $archive(@archives){
+                next if $ma_map->{$test_type}->{$archive->write_url()};
+                $ma_map->{$test_type}->{$archive->write_url()} = $self->__build_archive(test_type => $test_type, archive => $archive);
+            }
+        }
+        
+    }
+    
+    #define tests
     my @tests = ();
-    my %test_types = ();
     foreach my $test (@$tests) {
         if ($test->disabled) {
             $logger->debug("Skipping disabled test: ".$test->description);
@@ -236,7 +282,7 @@ sub add_mesh_tests {
             }
 
             if ($same_targets) {
-                my ($status, $res) = $self->__build_tests({ test => $test, targets => \%receiver_targets, target_receives => 1, target_sends => 1 });
+                my ($status, $res) = $self->__build_tests({ test => $test, targets => \%receiver_targets, target_receives => 1, target_sends => 1, created_by => $created_by, ma_map => $ma_map, configure_archives => $configure_archives });
                 if ($status != 0) {
                     die("Problem creating tests: ".$res);
                 }
@@ -244,94 +290,65 @@ sub add_mesh_tests {
                 push @tests, @$res;
             }
             else {
-                my ($status, $res) = $self->__build_tests({ test => $test, targets => \%receiver_targets, target_receives => 1 });
+                my ($status, $res) = $self->__build_tests({ test => $test, targets => \%receiver_targets, target_receives => 1, created_by => $created_by, ma_map => $ma_map, configure_archives => $configure_archives  });
                 if ($status != 0) {
                     die("Problem creating tests: ".$res);
                 }
 
                 push @tests, @$res;
 
-                ($status, $res) = $self->__build_tests({ test => $test, targets => \%sender_targets, target_sends => 1 });
+                ($status, $res) = $self->__build_tests({ test => $test, targets => \%sender_targets, target_sends => 1, created_by => $created_by, ma_map => $ma_map, configure_archives => $configure_archives  });
                 if ($status != 0) {
                     die("Problem creating tests: ".$res);
                 }
     
                 push @tests, @$res;
             }
-            
-            #track test types
-            $test_types{$test->parameters->type} = 1;
-
         };
         if ($@) {
             die("Problem adding test ".$test->description.": ".$@);
         }
     }
     
-    #add measurement archives
-    if($self->configure_archives()){
-        my $ma_map = {
-            "pinger" => {}, 
-            "perfsonarbuoy/owamp" => {}, 
-            "perfsonarbuoy/bwctl" => {}, 
-            "traceroute" => {}
-            };
-        foreach my $test_type(keys %test_types){
-            #lookup archive in explicit hosts and host classes. Append them all together if multiple match
-            my @archives = ();
-            if($local_host){
-                my $host_archive = $local_host->lookup_measurement_archive({ type => $test_type, recursive => 1 });
-                push @archives, $host_archive if($host_archive);
-            }
-            #lookup archives in host classes
-            foreach my $host_class(@{$host_classes}){
-                if($host_class->host_properties){
-                    my $hc_archive = $host_class->host_properties->lookup_measurement_archive({ type => $test_type, recursive => 1 });
-                    push @archives, $hc_archive if($hc_archive);
-                }
-            }
-            #lookup archives in requesting agent
-            if($requesting_agent){
-                 my $agent_archive = $requesting_agent->lookup_measurement_archive({ type => $test_type, recursive => 1 });
-                 push @archives, $agent_archive if($agent_archive);
-            }
-            
-            if(@archives < 1){
-                die("Unable to find measurement archive of type $test_type");
-            }
-            
-            #iterate through archives skipping duplicates (same URL + same type)
-            foreach my $archive(@archives){
-                next if $ma_map->{$test_type}->{$archive->write_url()};
-                my $archive_obj;
-                if ($test_type eq "pinger" || $test_type eq "perfsonarbuoy/owamp") {
-                    next if $ma_map->{'perfsonarbuoy/owamp'}->{$archive->write_url()} || $ma_map->{'pinger'}->{$archive->write_url()};
-                    $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondLatency();
-                    foreach my $summ(@{$default_summaries->{'latency'}}){
-                        push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
-                    }
-                }elsif ($test_type eq "traceroute") {
-                    $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondTraceroute();
-                }elsif ($test_type eq "perfsonarbuoy/bwctl") {
-                    $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondThroughput();
-                    foreach my $summ(@{$default_summaries->{'throughput'}}){
-                        push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
-                    }
-                }
-                $archive_obj->database($archive->write_url());
-                $archive_obj->added_by_mesh(1);
-                push @{ $self->regular_testing_conf->measurement_archives }, $archive_obj;
-                $ma_map->{$test_type}->{$archive->write_url()} = 1;
-            }
-        }
-        
-    }
+    
 
     push @{ $self->regular_testing_conf->tests }, @tests;
 
     return;
 }
 
+sub __build_archive(){
+    my ($self, @args) = @_;
+    my $parameters = validate( @args, { test_type => 1, archive => 1 });
+    my $test_type = $parameters->{test_type};
+    my $archive = $parameters->{archive};
+    
+    my $archive_obj;
+    if ($test_type eq "pinger") {
+        $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondLatency();
+        foreach my $summ(@{$default_summaries->{'latency'}}){
+            push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
+        }
+    }elsif ($test_type eq "perfsonarbuoy/owamp") {
+        $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondLatency();
+        foreach my $summ(@{$default_summaries->{'latency'}}){
+            push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
+        }
+    }elsif ($test_type eq "traceroute") {
+        $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondTraceroute();
+    }elsif ($test_type eq "perfsonarbuoy/bwctl") {
+        $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondThroughput();
+        foreach my $summ(@{$default_summaries->{'throughput'}}){
+            push @{$archive_obj->summary}, $archive_obj->create_summary_config(%{$summ});
+        }
+    }elsif ($test_type eq "simplestream") {
+        $archive_obj = new perfSONAR_PS::RegularTesting::MeasurementArchives::EsmondThroughput();
+    }
+    $archive_obj->database($archive->write_url());
+    $archive_obj->added_by_mesh(1);
+    
+    return $archive_obj;
+}
 sub __lookup_mapped_address {
     my ($self, @args) = @_;
     my $parameters = validate( @args, { address_map_field => 1, local_addr_maps => 1, local_address => 1, remote_address => 1, exclude_unmapped => 1});
@@ -374,15 +391,19 @@ sub __lookup_mapped_address {
 
 sub __build_tests {
     my ($self, @args) = @_;
-    my $parameters = validate( @args, { test => 1, targets => 1, target_sends => 0, target_receives => 0 });
+    my $parameters = validate( @args, { test => 1, targets => 1, target_sends => 0, target_receives => 0, created_by => 1, ma_map => 1, configure_archives => 1  });
     my $test = $parameters->{test};
     my $targets = $parameters->{targets};
     my $target_sends = $parameters->{target_sends};
     my $target_receives = $parameters->{target_receives};
-
+    my $created_by = $parameters->{created_by};
+    my $ma_map = $parameters->{ma_map};
+    my $configure_archives = $parameters->{configure_archives};
+    
     my @tests = ();
     foreach my $local_address (keys %{ $targets }) {
         my $test_obj = perfSONAR_PS::RegularTesting::Test->new();
+        $test_obj->created_by($created_by);
         $test_obj->added_by_mesh(1);
         $test_obj->description($test->description) if $test->description;
         $test_obj->local_address($local_address);
@@ -394,7 +415,30 @@ sub __build_tests {
             push @targets, $target_obj;
         }
         $test_obj->targets(\@targets);
-
+        
+        #add archives to test if needed
+        if($configure_archives){
+            my @measument_archives = ();
+            my $test_archives = $test->lookup_measurement_archives({ type => $test->parameters->type });
+            if($test_archives){
+                foreach my $test_archive(@{$test_archives}){
+                    if(!$ma_map->{$test->parameters->type}->{$test_archive->write_url()}){
+                        my $test_archive_obj = $self->__build_archive( test_type => $test->parameters->type, archive => $test_archive);
+                        push @measument_archives, $test_archive_obj if($test_archive_obj);
+                    }
+                }
+            }
+            
+            foreach my $ma_url(keys %{$ma_map->{$test->parameters->type}}){
+                push @measument_archives, $ma_map->{$test->parameters->type}->{$ma_url};
+            }
+            if(@measument_archives > 0){
+                $test_obj->measurement_archives(\@measument_archives);
+            }else{
+                $logger->warn("Unable to find measurement archive for test '" . $test_obj->description . "'. Proceeding with test but results will not be stored.");
+            }
+        }
+        
         my ($schedule, $parameters);
 
         if ($test->parameters->type eq "pinger") {
@@ -413,12 +457,15 @@ sub __build_tests {
             $parameters->suppress_loopback($test->parameters->suppress_loopback) if $test->parameters->suppress_loopback;
             $parameters->deadline($test->parameters->deadline) if $test->parameters->deadline;
             $parameters->timeout($test->parameters->timeout) if $test->parameters->timeout;
+            $parameters->packet_tos_bits($test->parameters->tos_bits) if $test->parameters->tos_bits;
             $parameters->force_ipv4($test->parameters->ipv4_only) if $test->parameters->ipv4_only;
             $parameters->force_ipv6($test->parameters->ipv6_only) if $test->parameters->ipv6_only;
 
             $schedule   = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
             $schedule->interval($test->parameters->test_interval);
             $schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
+            $schedule->slip($test->parameters->slip) if(defined $test->parameters->slip);
+            $schedule->slip_randomize($test->parameters->slip_randomize) if(defined $test->parameters->slip_randomize);
         }
         elsif ($test->parameters->type eq "traceroute") {
             if($self->use_bwctl2){
@@ -438,6 +485,7 @@ sub __build_tests {
             $parameters->queries($test->parameters->queries) if $test->parameters->queries;
             $parameters->sendwait($test->parameters->sendwait) if $test->parameters->sendwait;
             $parameters->wait($test->parameters->wait) if $test->parameters->wait;
+            $parameters->packet_tos_bits($test->parameters->tos_bits) if $test->parameters->tos_bits;
             $parameters->force_ipv4($test->parameters->ipv4_only) if $test->parameters->ipv4_only;
             $parameters->force_ipv6($test->parameters->ipv6_only) if $test->parameters->ipv6_only;
 
@@ -446,6 +494,8 @@ sub __build_tests {
             $schedule   = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
             $schedule->interval($test->parameters->test_interval) if $test->parameters->test_interval;
             $schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
+            $schedule->slip($test->parameters->slip) if(defined $test->parameters->slip);
+            $schedule->slip_randomize($test->parameters->slip_randomize) if(defined $test->parameters->slip_randomize);
         }
         elsif ($test->parameters->type eq "perfsonarbuoy/bwctl") {
             if($self->use_bwctl2){
@@ -472,7 +522,6 @@ sub __build_tests {
             $parameters->tcp_bandwidth($test->parameters->tcp_bandwidth) if $test->parameters->tcp_bandwidth;
             $parameters->mss($test->parameters->mss) if $test->parameters->mss;
             $parameters->dscp($test->parameters->dscp) if $test->parameters->dscp;
-            $parameters->dynamic_window_size($test->parameters->dynamic_window_size) if $test->parameters->dynamic_window_size;
             $parameters->no_delay($test->parameters->no_delay) if $test->parameters->no_delay;
             $parameters->congestion($test->parameters->congestion) if $test->parameters->congestion;
             $parameters->flow_label($test->parameters->flow_label) if $test->parameters->flow_label;
@@ -489,6 +538,8 @@ sub __build_tests {
 				$schedule   = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
             	$schedule->interval($test->parameters->interval) if $test->parameters->interval;
             	$schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
+            	$schedule->slip($test->parameters->slip) if(defined $test->parameters->slip);
+            	$schedule->slip_randomize($test->parameters->slip_randomize) if(defined $test->parameters->slip_randomize);
 			}
         }
         elsif ($test->parameters->type eq "perfsonarbuoy/owamp") {
@@ -509,10 +560,25 @@ sub __build_tests {
             $parameters->inter_packet_time($test->parameters->packet_interval) if($test->parameters->packet_interval);
             $parameters->packet_length($test->parameters->packet_padding) if($test->parameters->packet_padding);
             $parameters->output_raw($test->parameters->output_raw) if($test->parameters->output_raw);
+            $parameters->packet_tos_bits($test->parameters->tos_bits) if $test->parameters->tos_bits;
             $parameters->force_ipv4($test->parameters->ipv4_only) if $test->parameters->ipv4_only;
             $parameters->force_ipv6($test->parameters->ipv6_only) if $test->parameters->ipv6_only;
 
             $schedule = perfSONAR_PS::RegularTesting::Schedulers::Streaming->new();
+        }
+        elsif ($test->parameters->type eq "simplestream") {
+            $parameters = perfSONAR_PS::RegularTesting::Tests::SimpleStream->new();
+            $parameters->tool($test->parameters->tool) if($test->parameters->tool);
+            $parameters->dawdle($test->parameters->dawdle) if defined $test->parameters->dawdle;
+			$parameters->timeout($test->parameters->timeout) if defined $test->parameters->timeout;
+			$parameters->test_material($test->parameters->test_material) if $test->parameters->test_material;
+			$parameters->fail($test->parameters->fail) if defined  $test->parameters->fail;
+			
+			$schedule = perfSONAR_PS::RegularTesting::Schedulers::RegularInterval->new();
+            $schedule->interval($test->parameters->interval) if $test->parameters->interval;
+            $schedule->random_start_percentage($test->parameters->random_start_percentage) if(defined $test->parameters->random_start_percentage);
+            $schedule->slip($test->parameters->slip) if(defined $test->parameters->slip);
+            $schedule->slip_randomize($test->parameters->slip_randomize) if(defined $test->parameters->slip_randomize);
         }
 
         if ($target_sends and not $target_receives) {
@@ -522,7 +588,16 @@ sub __build_tests {
         if ($target_receives and not $target_sends) {
             $parameters->receive_only(1);
         }
-
+        
+        my @test_refs = ();
+        foreach my $test_ref(@{$test->references}){
+            push @test_refs, new perfSONAR_PS::RegularTesting::Reference({
+                    'name' => $test_ref->name(),
+                    'value' => $test_ref->value()
+                });
+        }
+        $test_obj->references(\@test_refs);
+        
         $test_obj->parameters($parameters);
         $test_obj->schedule($schedule);
 

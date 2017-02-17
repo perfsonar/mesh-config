@@ -10,7 +10,7 @@ use Log::Log4perl qw(get_logger);
 use Params::Validate qw(:all);
 use URI::Split qw(uri_split);
 
-use perfSONAR_PS::Utils::HTTPS qw(https_get);
+use perfSONAR_PS::Client::Utils qw(send_http_request build_err_msg);
 
 use perfSONAR_PS::MeshConfig::Config::Mesh;
 
@@ -202,41 +202,39 @@ sub __load_json {
     my $ca_certificate_file    = $parameters->{ca_certificate_file};
     my $ca_certificate_path    = $parameters->{ca_certificate_path};
 
-    my ($status, $res);
-
     my $uri = URI->new($url);
+    my $json_text = '';
     if ($uri->scheme eq "file") {
         eval {
-            $status = 0;
-            $res = "";
             open(FILE, $uri->path) or die("Couldn't open ".$uri->path);
             while(<FILE>) { 
-                $res .= $_;
+                $json_text .= $_;
             }
             close(FILE);
         };
         if ($@) {
-            $status = -1;
-            $res = $@;
+            return (-1, $@);
         }
     }
-    else {
-        ($status, $res) = https_get({ url                 => $url,
-                                      verify_certificate  => $validate_certificate,
-                                      verify_hostname     => $validate_certificate,
-                                      ca_certificate_file => $ca_certificate_file,
-                                      ca_certificate_path => $ca_certificate_path,
-                                   });
+    else { 
+        my $res = send_http_request({ 
+                                  connection_type     => 'GET',
+                                  timeout             => 60,
+                                  url                 => $url,
+                                  verify_hostname     => $validate_certificate,
+                                  ca_certificate_file => $ca_certificate_file,
+                                  ca_certificate_path => $ca_certificate_path,
+                                });
+        if(!$res->is_success){
+            my $msg = build_err_msg(http_response => $res);
+            $logger->debug("Problem retrieving mesh configuration from $url: ".$msg);
+            return (-1, $msg);
+        }
+        $json_text = $res->content;
     }
-
-    if ($status != 0) {
-        $logger->debug("Problem retrieving mesh configuration from $url: ".$res);
-        return ($status, $res);
-    }
-
     my $json;
     eval {
-        $json = JSON->new->decode($res);
+        $json = JSON->new->decode($json_text);
     };
     if ($@) {
         my $msg = "Problem parsing json for $url: ".$@;
@@ -429,6 +427,7 @@ sub __parse_hash {
                         "include"       => { },
                         "administrator" => { new_key => "administrators" },
                         "test" => { new_key => "tests" },
+                        "reference" => { new_key => "references" },
                         "measurement_archive" => { new_key => "measurement_archives" },
                         "address" => { new_key => "addresses", except => [ "address", "addresses" ] },
                         "tag" => { new_key => "tags", except => [ "filter", "filters" ] },

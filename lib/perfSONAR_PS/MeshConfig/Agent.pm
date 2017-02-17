@@ -400,6 +400,8 @@ sub __configure_host {
             # Add the tests to the various service configurations
             eval {
                 $generator->add_mesh_tests({ mesh => $mesh,
+                                             mesh_url => $mesh_params->{configuration_url},
+                                             configure_archives => $mesh_params->{configure_archives},
                                              tests => $tests,
                                              addresses => \@local_addresses,
                                              local_host => $hosts->[0],
