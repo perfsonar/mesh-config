@@ -23,6 +23,11 @@ case "$1" in
                 /etc/perfsonar/meshconfig-agent.conf \
                 3.5.1~3.rc1-2~bpo70+1~ -- "$@"
         fi
+
+        if dpkg-maintscript-helper supports rm_conffile; then
+            dpkg-maintscript-helper rm_conffile \
+                /etc/perfsonar/meshconfig-agent-tasks.conf -- "$@"
+        fi
     ;;
 
     abort-upgrade)
