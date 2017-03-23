@@ -1,4 +1,4 @@
-perfsonar-meshconfig (4.0~11.rc3-1) perfsonar-jessie-staging; urgency=low
+perfsonar-meshconfig (4.0~12.rc3-1) perfsonar-jessie-staging; urgency=low
 
   * New upstream version.
   * Adding ${misc:Depends} and pscheduler-server as dependencies.
@@ -8,7 +8,7 @@ perfsonar-meshconfig (4.0~11.rc3-1) perfsonar-jessie-staging; urgency=low
   * Adding autopkgtest tests.
   * meshconfig-agent-tasks.conf is now generated at install time
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 08 Mar 2017 14:33:38 +0100
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Thu, 23 Mar 2017 14:26:26 +0000
 
 perfsonar-meshconfig (3.5.1.2-1) perfsonar-jessie-release; urgency=low
 
