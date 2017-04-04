@@ -23,6 +23,7 @@ case "$1" in
     purge)
         # Remove generated config
         rm -f /etc/perfsonar/meshconfig-agent-tasks.conf
+        rm -f /etc/perfsonar/meshconfig-agent-tasks.conf.default
 
         # Remove data directory
         rm -rf /var/lib/perfsonar/meshconfig
