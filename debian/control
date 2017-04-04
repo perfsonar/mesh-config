@@ -37,6 +37,9 @@ Depends: perl, perfsonar-meshconfig-shared, perfsonar-common,
  liblinux-inotify2-perl, libperfsonar-pscheduler-perl,
  liblog-dispatch-filerotate-perl, 
  libperfsonar-toolkit-perl, pscheduler-server, ${misc:Depends}
+Provides: perfsonar-regulartesting
+Replaces: perfsonar-regulartesting
+Conflicts: perfsonar-regulartesting
 Description: perfSONAR MeshConfig Agent
  The perfSONAR-PS Mesh Configuration Agent downloads a centralized JSON file
  describing the tests to run and uses it to generate appropriate configuration
