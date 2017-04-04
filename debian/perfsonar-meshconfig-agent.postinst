@@ -43,6 +43,14 @@ case "$1" in
             fi
         fi
 
+        # Upgrade from regulartesting
+        if [ -e /etc/perfsonar/regulartesting.conf ]; then
+            mv -v /etc/perfsonar/meshconfig-agent-tasks.conf \
+                  /etc/perfsonar/meshconfig-agent-tasks.conf.default
+            mv -v /etc/perfsonar/regulartesting.conf \
+                  /etc/perfsonar/meshconfig-agent-tasks.conf
+        fi
+
         # Task configuration file need to be writable by perfsonar user
         chown perfsonar:perfsonar /etc/perfsonar/meshconfig-agent-tasks.conf
     ;;
