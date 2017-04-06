@@ -1,0 +1,13 @@
+--- a/bin/perfsonar_meshconfig_guiagent
++++ b/bin/perfsonar_meshconfig_guiagent
+@@ -17,6 +17,10 @@
+ use FindBin qw($Bin);
+ use lib "$Bin/../lib";
+ 
++# workaround errors while loading YAML
++$INC{'Mo/builder.pm'} = 1;
++$INC{'Mo/default.pm'} = 1;
++
+ use Getopt::Long;
+ use Config::General;
+ use Linux::Inotify2;
