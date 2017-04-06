@@ -23,6 +23,7 @@ case "$1" in
     purge)
         # Remove logs
         rm -f /var/log/maddash/meshconfig-guiagent.log*
+        rm -f /var/log/perfsonar/meshconfig-guiagent.log*
     ;;
 
    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
