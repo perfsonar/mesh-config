@@ -4,3 +4,4 @@ bin/perfsonar_meshconfig_guiagent usr/lib/perfsonar/bin
 lib/perfSONAR_PS/MeshConfig/GUIAgent.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig
 lib/perfSONAR_PS/MeshConfig/Generators/MaDDash usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig/Generators
 lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm usr/lib/perfsonar/lib/perfSONAR_PS/MeshConfig/Generators
+scripts/perfsonar-meshconfig-guiagent.service lib/systemd/system/
