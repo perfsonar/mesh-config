@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=forking
 PIDFile=/var/run/perfsonar-meshconfig-guiagent.pid
-ExecStart=/usr/lib/perfsonar/bin/perfsonar_meshconfig_guiagent --config=/etc/perfsonar/meshconfig-guiagent.conf --logger=/etc/perfsonar/meshconfig-guiagent-logger.conf --user=perfsonar --group=perfsonar
+ExecStart=/usr/lib/perfsonar/bin/perfsonar_meshconfig_guiagent --config=/etc/perfsonar/meshconfig-guiagent.conf --logger=/etc/perfsonar/meshconfig-guiagent-logger.conf --user=maddash --group=maddash
 
 [Install]
 WantedBy=multi-user.target
