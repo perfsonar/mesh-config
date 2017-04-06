@@ -22,8 +22,8 @@ SCRIPTNAME=/etc/init.d/$NAME
 CONFDIR=/etc/perfsonar
 CONFFILE=${CONFDIR}/meshconfig-guiagent.conf
 LOGFILE=${CONFDIR}/meshconfig-guiagent-logger.conf
-USER=perfsonar
-GROUP=perfsonar
+USER=maddash
+GROUP=maddash
 DAEMON_ARGS="--config=${CONFFILE} --logger=${LOGFILE} --user=${USER} --group=${GROUP}"
 
 # Exit if the package is not installed
