@@ -1,10 +1,10 @@
-perfsonar-meshconfig (4.0~12.rc3-2~bpo70+1) perfsonar-wheezy-staging; urgency=low
+perfsonar-meshconfig (4.0-1~bpo70+1) perfsonar-wheezy-release; urgency=low
 
   * Backport to Wheezy.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Fri, 07 Apr 2017 14:47:14 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Thu, 13 Apr 2017 15:34:48 +0000
 
-perfsonar-meshconfig (4.0~12.rc3-2) perfsonar-jessie-staging; urgency=low
+perfsonar-meshconfig (4.0-1) perfsonar-jessie-release; urgency=low
 
   * New upstream version.
   * New meshconfig-guiagent service.
@@ -14,8 +14,10 @@ perfsonar-meshconfig (4.0~12.rc3-2) perfsonar-jessie-staging; urgency=low
   * Adding autopkgtest tests.
   * meshconfig-agent-tasks.conf is now generated at install time and created
     from /etc/perfsonar/regulartesting.conf if it exists.
+  * Conflicting with perfsonar-regulartesting as this is replaced by
+    this new version of the meshconfig-agent and pscheduler.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Fri, 07 Apr 2017 14:45:22 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Thu, 13 Apr 2017 15:31:51 +0000
 
 perfsonar-meshconfig (3.5.1.2-1) perfsonar-jessie-release; urgency=low
 
