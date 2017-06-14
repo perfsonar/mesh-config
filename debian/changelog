@@ -1,8 +1,14 @@
-perfsonar-meshconfig (4.0.0.1-1~bpo70+1) perfsonar-wheezy-release; urgency=low
+perfsonar-meshconfig (4.0.0.2-1~bpo70+1) perfsonar-wheezy-release; urgency=low
 
   * Backport to Wheezy.
 
- -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Fri, 05 May 2017 12:29:57 +0000
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 14 Jun 2017 18:07:05 +0000
+
+perfsonar-meshconfig (4.0.0.2-1) perfsonar-jessie-release; urgency=low
+
+  * New upstream version.
+
+ -- Antoine Delvaux <antoine.delvaux@man.poznan.pl>  Wed, 14 Jun 2017 18:05:42 +0000
 
 perfsonar-meshconfig (4.0.0.1-1) perfsonar-jessie-release; urgency=low
 
