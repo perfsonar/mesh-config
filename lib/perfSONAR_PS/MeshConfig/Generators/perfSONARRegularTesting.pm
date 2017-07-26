@@ -101,6 +101,7 @@ sub init {
             next if ($archive->added_by_mesh);
             push @new_archives, $archive;
         }
+        $config->measurement_archives(\@new_archives);
         
         # Remove the existing bind_addresses that were added by the mesh configuration
         my @new_bind_addresses = ();
@@ -111,7 +112,7 @@ sub init {
         $config->bind_addresses(\@new_bind_addresses);
     };
     if ($@) {
-        my $msg = "Problem initializing pinger landmarks: ".$@;
+        my $msg = "Problem initializing $config_file: ".$@;
         $logger->error($msg);
         return (-1, $msg);
     }
