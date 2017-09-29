@@ -31,7 +31,7 @@
          acceptable_throughput    900
 --- a/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
 +++ b/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-@@ -688,7 +688,7 @@
+@@ -678,7 +678,7 @@
  my %maddash_default_check_options = (
      "perfsonarbuoy/owamp" => {
          enabled => 1,
@@ -40,7 +40,7 @@
          check_interval => 1800,
          check_time_range => 2700,
          retry_interval => 300,
-@@ -704,7 +704,7 @@
+@@ -694,7 +694,7 @@
      },
      "perfsonarbuoy/bwctl" => {
          enabled => 1,
@@ -49,7 +49,7 @@
          check_interval => 28800,
          check_time_range => 86400,
          retry_interval => 300,
-@@ -720,7 +720,7 @@
+@@ -710,7 +710,7 @@
      },
      "simplestream" => {
          enabled => 1,
@@ -58,7 +58,7 @@
          check_interval => 1800,
          check_time_range => 3600,
          retry_interval => 300,
-@@ -736,7 +736,7 @@
+@@ -726,7 +726,7 @@
      },
      "traceroute" => {
          enabled => 1,
@@ -67,7 +67,7 @@
          check_interval => 1800,
          check_time_range => 3600,
          retry_interval => 300,
-@@ -752,7 +752,7 @@
+@@ -742,7 +742,7 @@
      },
      "pinger" => {
          enabled => 1,
