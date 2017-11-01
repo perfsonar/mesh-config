@@ -1,5 +1,7 @@
---- a/etc/meshconfig-guiagent-logger.conf
-+++ b/etc/meshconfig-guiagent-logger.conf
+Index: mesh-config/etc/meshconfig-guiagent-logger.conf
+===================================================================
+--- mesh-config.orig/etc/meshconfig-guiagent-logger.conf	2017-09-29 14:51:58.000000000 +0000
++++ mesh-config/etc/meshconfig-guiagent-logger.conf	2017-11-01 17:59:26.000000000 +0000
 @@ -11,7 +11,7 @@
  log4perl.appender.A1=Log::Dispatch::FileRotate
  
@@ -9,8 +11,10 @@
  log4perl.appender.A1.max=7
  log4perl.appender.A1.size=16777216
  log4perl.appender.A1.mode=append
---- a/etc/meshconfig-guiagent.conf
-+++ b/etc/meshconfig-guiagent.conf
+Index: mesh-config/etc/meshconfig-guiagent.conf
+===================================================================
+--- mesh-config.orig/etc/meshconfig-guiagent.conf	2017-09-29 14:51:58.000000000 +0000
++++ mesh-config/etc/meshconfig-guiagent.conf	2017-11-01 17:59:26.000000000 +0000
 @@ -68,7 +68,7 @@
  # the mesh, these will be used.
  <maddash_options>
@@ -29,8 +33,10 @@
          check_interval           14400
          check_time_range         86400
          acceptable_throughput    900
---- a/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
-+++ b/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
+Index: mesh-config/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
+===================================================================
+--- mesh-config.orig/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm	2017-09-29 14:51:58.000000000 +0000
++++ mesh-config/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm	2017-11-01 17:59:26.000000000 +0000
 @@ -678,7 +678,7 @@
  my %maddash_default_check_options = (
      "perfsonarbuoy/owamp" => {
