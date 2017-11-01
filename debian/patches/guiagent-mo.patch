@@ -1,5 +1,7 @@
---- a/bin/perfsonar_meshconfig_guiagent
-+++ b/bin/perfsonar_meshconfig_guiagent
+Index: mesh-config/bin/perfsonar_meshconfig_guiagent
+===================================================================
+--- mesh-config.orig/bin/perfsonar_meshconfig_guiagent	2017-11-01 17:59:26.000000000 +0000
++++ mesh-config/bin/perfsonar_meshconfig_guiagent	2017-11-01 18:01:02.000000000 +0000
 @@ -17,6 +17,10 @@
  use FindBin qw($Bin);
  use lib "$Bin/../lib";
