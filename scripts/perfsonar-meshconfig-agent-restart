@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -f "/etc/init.d/perfsonar-meshconfig-agent" ]; then
+    /etc/init.d/perfsonar-meshconfig-agent restart
+else
+    systemctl restart perfsonar-meshconfig-agent
+fi
+
+exit 0

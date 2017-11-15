@@ -143,6 +143,8 @@ install -D -m 0644 scripts/%{script_guiagent}.service %{buildroot}/%{_unitdir}/%
 install -D -m 0755 scripts/%{script_agent} %{buildroot}/etc/init.d/%{script_agent}
 install -D -m 0755 scripts/%{script_guiagent} %{buildroot}/etc/init.d/%{script_guiagent}
 %endif
+install -D -m 0755 scripts/%{script_agent}-restart %{buildroot}/etc/cron.daily/%{script_agent}-restart
+install -D -m 0755 scripts/%{script_guiagent}-restart %{buildroot}/etc/cron.daily/%{script_guiagent}-restart
 rm -rf %{buildroot}/%{install_base}/scripts/
 
 install -D -m 0644 %{buildroot}/%{install_base}/doc/cron-lookup_hosts %{buildroot}/%{doc_base}/perfsonar-meshconfig-jsonbuilder/cron-lookup_hosts
@@ -311,6 +313,7 @@ fi
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/perfsonar_meshconfig_agent
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Agent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm
+%attr(0755,root,root) /etc/cron.daily/%{script_agent}-restart
 %if 0%{?el7}
 %attr(0644,root,root) %{_unitdir}/%{script_agent}.service
 %else
@@ -326,6 +329,7 @@ fi
 %{install_base}/lib/perfSONAR_PS/MeshConfig/GUIAgent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash/DefaultReports.pm
+%attr(0755,root,root) /etc/cron.daily/%{script_guiagent}-restart
 %if 0%{?el7}
 %attr(0644,root,root) %{_unitdir}/%{script_guiagent}.service
 %else
