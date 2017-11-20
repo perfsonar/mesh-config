@@ -8,7 +8,7 @@
 %define relnum 1 
 
 Name:			perfsonar-meshconfig
-Version:		4.0.2
+Version:		4.0.2.1
 Release:		%{relnum}%{?dist}
 Summary:		perfSONAR Mesh Configuration Agent
 License:		Distributable, see LICENSE
