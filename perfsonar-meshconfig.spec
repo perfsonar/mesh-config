@@ -11,7 +11,7 @@ Name:			perfsonar-meshconfig
 Version:		4.1
 Release:		%{relnum}%{?dist}
 Summary:		perfSONAR Mesh Configuration Agent
-License:		Distributable, see LICENSE
+License:		ASL 2.0
 Group:			Development/Libraries
 URL:			http://www.perfsonar.net
 Source0:		perfsonar-meshconfig-%{version}.%{relnum}.tar.gz
@@ -291,11 +291,13 @@ fi
 
 %files shared
 %defattr(0644,perfsonar,perfsonar,0755)
+%license LICENSE
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Utils.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Config
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/Base.pm
 
 %files jsonbuilder
+%license LICENSE
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/build_json
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/validate_json
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/validate_configuration
@@ -306,6 +308,7 @@ fi
 %doc %{doc_base}/perfsonar-meshconfig-jsonbuilder/cron-lookup_hosts
 
 %files agent
+%license LICENSE
 %defattr(0644,perfsonar,perfsonar,0755)
 %config(noreplace) %{config_base}/meshconfig-agent.conf
 %config(noreplace) %{config_base}/meshconfig-agent-logger.conf
@@ -322,6 +325,7 @@ fi
 
 
 %files guiagent
+%license LICENSE
 %defattr(0644,perfsonar,perfsonar,0755)
 %config(noreplace) %{config_base}/meshconfig-guiagent.conf
 %config(noreplace) %{config_base}/meshconfig-guiagent-logger.conf
