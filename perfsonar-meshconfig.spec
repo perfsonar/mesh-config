@@ -5,13 +5,13 @@
 %define script_agent perfsonar-meshconfig-agent
 %define script_guiagent perfsonar-meshconfig-guiagent
 
-%define relnum 1 
+%define relnum 0.0.a1 
 
 Name:			perfsonar-meshconfig
-Version:		4.0.2
+Version:		4.1
 Release:		%{relnum}%{?dist}
 Summary:		perfSONAR Mesh Configuration Agent
-License:		Distributable, see LICENSE
+License:		ASL 2.0
 Group:			Development/Libraries
 URL:			http://www.perfsonar.net
 Source0:		perfsonar-meshconfig-%{version}.%{relnum}.tar.gz
@@ -143,6 +143,8 @@ install -D -m 0644 scripts/%{script_guiagent}.service %{buildroot}/%{_unitdir}/%
 install -D -m 0755 scripts/%{script_agent} %{buildroot}/etc/init.d/%{script_agent}
 install -D -m 0755 scripts/%{script_guiagent} %{buildroot}/etc/init.d/%{script_guiagent}
 %endif
+install -D -m 0755 scripts/%{script_agent}-restart %{buildroot}/etc/cron.daily/%{script_agent}-restart
+install -D -m 0755 scripts/%{script_guiagent}-restart %{buildroot}/etc/cron.daily/%{script_guiagent}-restart
 rm -rf %{buildroot}/%{install_base}/scripts/
 
 install -D -m 0644 %{buildroot}/%{install_base}/doc/cron-lookup_hosts %{buildroot}/%{doc_base}/perfsonar-meshconfig-jsonbuilder/cron-lookup_hosts
@@ -289,11 +291,13 @@ fi
 
 %files shared
 %defattr(0644,perfsonar,perfsonar,0755)
+%license LICENSE
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Utils.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Config
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/Base.pm
 
 %files jsonbuilder
+%license LICENSE
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/build_json
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/validate_json
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/validate_configuration
@@ -304,6 +308,7 @@ fi
 %doc %{doc_base}/perfsonar-meshconfig-jsonbuilder/cron-lookup_hosts
 
 %files agent
+%license LICENSE
 %defattr(0644,perfsonar,perfsonar,0755)
 %config(noreplace) %{config_base}/meshconfig-agent.conf
 %config(noreplace) %{config_base}/meshconfig-agent-logger.conf
@@ -311,6 +316,7 @@ fi
 %attr(0755,perfsonar,perfsonar) %{install_base}/bin/perfsonar_meshconfig_agent
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Agent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm
+%attr(0755,root,root) /etc/cron.daily/%{script_agent}-restart
 %if 0%{?el7}
 %attr(0644,root,root) %{_unitdir}/%{script_agent}.service
 %else
@@ -319,6 +325,7 @@ fi
 
 
 %files guiagent
+%license LICENSE
 %defattr(0644,perfsonar,perfsonar,0755)
 %config(noreplace) %{config_base}/meshconfig-guiagent.conf
 %config(noreplace) %{config_base}/meshconfig-guiagent-logger.conf
@@ -326,6 +333,7 @@ fi
 %{install_base}/lib/perfSONAR_PS/MeshConfig/GUIAgent.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash.pm
 %{install_base}/lib/perfSONAR_PS/MeshConfig/Generators/MaDDash/DefaultReports.pm
+%attr(0755,root,root) /etc/cron.daily/%{script_guiagent}-restart
 %if 0%{?el7}
 %attr(0644,root,root) %{_unitdir}/%{script_guiagent}.service
 %else

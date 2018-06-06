@@ -385,6 +385,7 @@ while(1){
             $task_manager->init(
                                 pscheduler_url => $conf{pscheduler_url},
                                 tracker_file => $conf{pscheduler_tracker_file},
+                                reference_label => "mesh-config",
                                 client_uuid_file => $conf{client_uuid_file},
                                 user_agent => "perfsonar-meshconfig",
                                 new_task_min_ttl => $conf{"task_min_ttl"},

@@ -1,3 +1,4 @@
+LICENSE
 MANIFEST
 Makefile
 bin/build_json
@@ -67,6 +68,8 @@ lib/perfSONAR_PS/MeshConfig/Generators/perfSONARRegularTesting.pm
 lib/perfSONAR_PS/MeshConfig/Utils.pm
 scripts/example_client.pl
 scripts/perfsonar-meshconfig-agent
+scripts/perfsonar-meshconfig-agent-restart
 scripts/perfsonar-meshconfig-agent.service
 scripts/perfsonar-meshconfig-guiagent
+scripts/perfsonar-meshconfig-guiagent-restart
 scripts/perfsonar-meshconfig-guiagent.service

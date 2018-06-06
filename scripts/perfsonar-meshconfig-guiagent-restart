@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -f "/etc/init.d/perfsonar-meshconfig-guiagent" ]; then
+    /etc/init.d/perfsonar-meshconfig-guiagent restart
+else
+    systemctl restart perfsonar-meshconfig-guiagent
+fi
+
+exit 0
